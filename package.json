@@ -1,0 +1,26 @@
+{
+	"name": "events",
+	"version": "0.0.1",
+	"description": "Add and display events on your WordPress site.",
+	"main": "index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "stylelint './src/**/*.scss'",
+		"lint:js": "eslint './src/**/*.js'",
+		"lint:php": "composer run lint",
+		"format:css": "stylelint --fix './src/**/*.scss'",
+		"format:js": "eslint --fix './src/**/*.js'",
+		"format:php": "composer run format",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start"
+	},
+	"author": "eighteen73 Web Team",
+	"license": "GPL-2.0-or-later",
+	"devDependencies": {
+		"@eighteen73/eslint-config-wordpress": "^1.0.3",
+		"@eighteen73/stylelint-config-wordpress": "^1.2.1",
+		"@wordpress/scripts": "^30.18.0"
+	}
+}
