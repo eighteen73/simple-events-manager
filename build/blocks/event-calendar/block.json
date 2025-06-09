@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "eighteen73/event-calendar",
+  "title": "Event Calendar",
+  "category": "widgets",
+  "description": "Displays events in a calendar.",
+  "textdomain": "event-calendar",
+  "icon": "calendar",
+  "supports": {
+    "html": false,
+    "multiple": false,
+    "spacing": {
+      "margin": true
+    }
+  },
+  "attributes": {
+    "postParent": {
+      "type": "string"
+    },
+    "postType": {
+      "type": "string",
+      "default": "event"
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php",
+  "viewScript": "file:./view.js"
+}

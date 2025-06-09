@@ -22,5 +22,10 @@
 		"@eighteen73/eslint-config-wordpress": "^1.0.3",
 		"@eighteen73/stylelint-config-wordpress": "^1.2.1",
 		"@wordpress/scripts": "^30.18.0"
+	},
+	"dependencies": {
+		"@fullcalendar/core": "^6.1.17",
+		"@fullcalendar/daygrid": "^6.1.17",
+		"@fullcalendar/react": "^6.1.17"
 	}
 }
