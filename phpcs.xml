@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="WooCommerce-Manual-Order">
-	<description>WooCommerce Manual Order</description>
+<ruleset name="Events">
+	<description>Events</description>
 
 	<!-- Scan all files in directory -->
 	<file>.</file>
