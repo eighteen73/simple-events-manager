@@ -14,8 +14,5 @@
 	"scripts": {
 		"lint": "./vendor/bin/phpcs --standard=./phpcs.xml",
 		"format": "./vendor/bin/phpcbf --standard=./phpcs.xml"
-	},
-	"require": {
-		"johnbillion/extended-cpts": "^5.0"
 	}
 }

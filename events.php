@@ -27,4 +27,5 @@ define( 'EVENTS_PATH', plugin_dir_path( __FILE__ ) );
 // Require the autoloader.
 require_once 'autoload.php';
 
-// Initialise classes.
+// Initialise classes
+Event::instance()->boot();

@@ -9,13 +9,13 @@
  *
  * @return void
  *
- * @package WooCommerceManualOrder
+ * @package Events
  */
 
 spl_autoload_register(
 	function ( $class_name ) {
 		$namspaces = [
-			'Eighteen73\\WooCommerceManualOrder\\' => __DIR__ . '/includes/classes/',
+			'Eighteen73\\Events\\' => __DIR__ . '/includes/classes/',
 		];
 		foreach ( $namspaces as $prefix => $base_dir ) {
 			$len = strlen( $prefix );
