@@ -29,3 +29,5 @@ require_once 'autoload.php';
 
 // Initialise classes
 Event::instance()->boot();
+Blocks::instance()->boot();
+Enqueue::instance()->boot();

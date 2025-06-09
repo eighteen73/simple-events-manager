@@ -36,7 +36,7 @@ class Event {
 	 *
 	 * @return void
 	 */
-	public function register() {
+	public function register(): void {
 		register_extended_post_type(
 			$this->name,
 			[
@@ -65,7 +65,7 @@ class Event {
 	 *
 	 * @return void
 	 */
-	public function meta() {
+	public function meta(): void {
 
 		register_post_meta(
 			$this->name,
