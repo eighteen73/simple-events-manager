@@ -1,12 +1,7 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export function AbstractRepeater( {
-	value = [],
-	onChange,
-	allowReordering = false,
-	children,
-} ) {
+export function AbstractRepeater( { value = [], onChange, children } ) {
 	const addItem = () => onChange( [ ...value, {} ] );
 	const setItem = ( index ) => ( newItem ) => {
 		const newValue = [ ...value ];
