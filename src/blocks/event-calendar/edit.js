@@ -20,7 +20,7 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	useEffect( () => {
 		setIsLoadingCategories( true );
-		fetch( '/wp-json/wp/v2/event_category' ) // Adjust per_page as needed
+		fetch( '/wp-json/wp/v2/event_category' )
 			.then( ( response ) => response.json() )
 			.then( ( data ) => {
 				const formattedCategories = data.map( ( term ) => ( {
