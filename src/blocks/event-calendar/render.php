@@ -9,7 +9,7 @@
  * @package Pulsar
  */
 
-$post_type = $attributes['postType'];
+$post_type = 'event';
 $parent_post_id = isset( $attributes['postParent'] ) ? [ $attributes['postParent'] ] : [];
 
 $events_query = new WP_Query(

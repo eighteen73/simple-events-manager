@@ -24,8 +24,8 @@
 		"@wordpress/scripts": "^30.18.0"
 	},
 	"dependencies": {
-		"@fullcalendar/core": "^6.1.17",
-		"@fullcalendar/daygrid": "^6.1.17",
-		"@fullcalendar/react": "^6.1.17"
+		"@fullcalendar/core": "^6.1.15",
+		"@fullcalendar/daygrid": "^6.1.15",
+		"@fullcalendar/react": "^6.1.15"
 	}
 }

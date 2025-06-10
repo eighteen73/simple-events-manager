@@ -14,15 +14,6 @@
       "margin": true
     }
   },
-  "attributes": {
-    "postParent": {
-      "type": "string"
-    },
-    "postType": {
-      "type": "string",
-      "default": "event"
-    }
-  },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",

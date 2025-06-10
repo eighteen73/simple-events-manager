@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { AbstractRepeater } from '../components/abstract-repeater.js';
+import { AbstractRepeater } from '../components/abstract-repeater';
 
 const EventDetailsPanel = () => {
 	const postType = useSelect(
