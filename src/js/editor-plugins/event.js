@@ -8,7 +8,7 @@ import {
 	__experimentalVStack as VStack, // eslint-disable-line @wordpress/no-unsafe-wp-apis
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { AbstractRepeater } from '../components/abstract-repeater';
@@ -19,18 +19,8 @@ const EventDetailsPanel = () => {
 		[]
 	);
 	const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
-	const [ displayRecurrence, setDisplayRecurrence ] = useState( false );
 	const [ endDateError, setEndDateError ] = useState( null );
-
-	useEffect( () => {
-		if ( meta.event_recurrence === 'single' ) {
-			setDisplayRecurrence( false );
-		} else if ( meta.event_recurrence === 'custom' ) {
-			setDisplayRecurrence( true );
-		} else {
-			setDisplayRecurrence( true );
-		}
-	}, [ meta.event_recurrence, meta.event_recurrence_end ] );
+	const showRecurrenceControls = meta.event_recurrence !== 'single';
 
 	if ( postType !== 'event' || ! meta ) {
 		return null;
@@ -68,10 +58,6 @@ const EventDetailsPanel = () => {
 
 		return dates;
 	} )();
-
-	const handleRecurrenceEndDateChange = ( value ) => {
-		updateMeta( 'event_recurrence_end', value );
-	};
 
 	const validateEndDate = ( startDate, endDate ) => {
 		if ( startDate && endDate ) {
@@ -152,10 +138,8 @@ const EventDetailsPanel = () => {
 
 				<ToggleControl
 					label={ __( 'Repeat event', 'events' ) }
-					checked={ displayRecurrence }
+					checked={ showRecurrenceControls }
 					onChange={ ( value ) => {
-						setDisplayRecurrence( value );
-
 						if ( ! value ) {
 							updateMeta( 'event_recurrence', 'single' );
 						} else if ( meta.event_recurrence === 'single' ) {
@@ -164,7 +148,7 @@ const EventDetailsPanel = () => {
 					} }
 				/>
 
-				{ displayRecurrence && (
+				{ showRecurrenceControls && (
 					<>
 						<SelectControl
 							label={ __( 'Event Recurrence', 'events' ) }
@@ -185,11 +169,6 @@ const EventDetailsPanel = () => {
 							] }
 							onChange={ ( value ) => {
 								updateMeta( 'event_recurrence', value );
-								if ( value === 'custom' ) {
-									setDisplayRecurrence( true );
-								} else {
-									setDisplayRecurrence( true );
-								}
 							} }
 						/>
 
@@ -277,7 +256,9 @@ const EventDetailsPanel = () => {
 								) }
 								type="date"
 								value={ meta.event_recurrence_end || '' }
-								onChange={ handleRecurrenceEndDateChange }
+								onChange={ ( value ) => {
+									updateMeta( 'event_recurrence_end', value );
+								} }
 							/>
 						) }
 					</>
