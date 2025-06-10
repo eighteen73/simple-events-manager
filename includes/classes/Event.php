@@ -66,7 +66,6 @@ class Event {
 	 * @return void
 	 */
 	public function meta(): void {
-
 		register_post_meta(
 			$this->name,
 			"{$this->name}_location",
@@ -123,6 +122,7 @@ class Event {
 
 			],
 		);
+
 		register_post_meta(
 			'event',
 			'event_custom_dates',
@@ -147,6 +147,7 @@ class Event {
 				'type'   => 'array',
 			]
 		);
+
 		register_post_meta(
 			$this->name,
 			"{$this->name}_recurrence_end",
