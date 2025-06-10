@@ -10,18 +10,29 @@
  */
 
 $post_type = 'event';
+$event_category = $attributes['eventCategory'];
 $parent_post_id = isset( $attributes['postParent'] ) ? [ $attributes['postParent'] ] : [];
 
-$events_query = new WP_Query(
-	[
-		'post_type'      => $post_type,
-		'posts_per_page' => -1,
-		'orderby'        => 'meta_value',
-		'post_parent__in' => $parent_post_id,
-		'meta_key'       => $post_type . '_date',
-		'order'          => 'ASC',
-	]
-);
+$query_args = [
+	'post_type'      => $post_type,
+	'posts_per_page' => -1,
+	'orderby'        => 'meta_value',
+	'post_parent__in' => $parent_post_id,
+	'meta_key'       => $post_type . '_date',
+	'order'          => 'ASC',
+];
+
+if ( ! empty( $event_category ) ) {
+	$query_args['tax_query'] = [
+		[
+			'taxonomy' => 'event_category',
+			'field'    => 'term_id',
+			'terms'    => (int) $event_category,
+		],
+	];
+}
+
+$events_query = new WP_Query( $query_args );
 
 if ( ! $events_query->have_posts() ) {
 	return;
