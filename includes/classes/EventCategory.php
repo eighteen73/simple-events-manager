@@ -11,7 +11,14 @@ namespace Eighteen73\Events;
  * "Event Category" registration class
  */
 class EventCategory {
-	use singleton;
+	use Singleton;
+
+	/**
+	 * The taxonomy name
+	 *
+	 * @var string $name
+	 */
+	protected $name = 'event_category';
 
 	/**
 	 * Bootstraps the class' actions/filters.
@@ -28,9 +35,9 @@ class EventCategory {
 	 *
 	 * @return void
 	 */
-	public function register() {
+	public function register(): void {
 		register_extended_taxonomy(
-			'event_category',
+			$this->name,
 			[ 'event' ],
 			[
 				'show_in_rest' => true,

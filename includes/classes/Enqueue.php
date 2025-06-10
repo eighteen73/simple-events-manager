@@ -29,7 +29,6 @@ class Enqueue {
 	 * @return void
 	 */
 	public function editor_scripts(): void {
-
 		wp_enqueue_script(
 			'events-editor-scripts',
 			EVENTS_URL . 'build/js/editor.js',
