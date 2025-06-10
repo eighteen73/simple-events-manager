@@ -32,7 +32,7 @@ $events = [];
 while ( $events_query->have_posts() ) {
 	$events_query->the_post();
 
-	$today = gmdate( 'Y-m-d H:i:s', strtotime( 'today' . ' midnight' ) );
+	$today = gmdate( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
 
 	$event_start_date_meta = get_post_meta( get_the_ID(), $post_type . '_date', true );
 	$event_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' midnight' ) );
