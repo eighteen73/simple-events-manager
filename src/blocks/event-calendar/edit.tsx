@@ -41,5 +41,9 @@ export default function Edit() {
 		return null;
 	}
 
-	return <div { ...blockProps }></div>;
+	return (
+		<div { ...blockProps }>
+			<p>Calendar here</p>
+		</div>
+	);
 }

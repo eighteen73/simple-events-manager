@@ -2,11 +2,10 @@ import { registerPlugin } from '@wordpress/plugins';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import {
 	TextControl,
-	DatePicker,
 	ToggleControl,
 	SelectControl,
 	Button,
-	__experimentalVStack as VStack,
+	__experimentalVStack as VStack, // eslint-disable-line @wordpress/no-unsafe-wp-apis
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
@@ -19,32 +18,39 @@ const EventDetailsPanel = () => {
 		( select ) => select( 'core/editor' ).getCurrentPostType(),
 		[]
 	);
-	if ( postType !== 'event' ) return null;
-
 	const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
+	const [ displayRecurrence, setDisplayRecurrence ] = useState( false );
+	const [ endDateError, setEndDateError ] = useState( null );
 
-	if ( ! meta ) return null;
+	useEffect( () => {
+		if ( meta.event_recurrence === 'single' ) {
+			setDisplayRecurrence( false );
+		} else if ( meta.event_recurrence === 'custom' ) {
+			setDisplayRecurrence( true );
+		} else {
+			setDisplayRecurrence( true );
+		}
+	}, [ meta.event_recurrence, meta.event_recurrence_end ] );
 
-	const [ displayEndDate, setDisplayEndDate ] = useState(
-		!! meta?.event_end_date
-	);
-
-	const [ displayRecurrence, setDisplayRecurrence ] = useState( true );
+	if ( postType !== 'event' || ! meta ) {
+		return null;
+	}
 
 	const updateMeta = ( field, value ) => {
 		setMeta( { ...meta, [ field ]: value } );
 	};
 
 	const nextEventDates = ( () => {
-		if ( ! meta?.event_date || meta.event_recurrence === 'single' )
+		if ( ! meta?.event_date || meta.event_recurrence === 'single' ) {
 			return [];
+		}
 
 		const startDate = new Date( meta.event_date );
 		const endDate = meta.event_recurrence_end
 			? new Date( meta.event_recurrence_end )
 			: null;
 		const dates = [];
-		let currentDate = new Date( startDate );
+		const currentDate = new Date( startDate );
 
 		while ( ! endDate || currentDate <= endDate ) {
 			dates.push( new Date( currentDate ) );
@@ -55,51 +61,44 @@ const EventDetailsPanel = () => {
 			} else {
 				break;
 			}
-			if ( ! endDate && dates.length >= 10 ) break;
+			if ( ! endDate && dates.length >= 10 ) {
+				break;
+			}
 		}
 
 		return dates;
 	} )();
 
-	const [ recurrenceEndDate, setRecurrenceEndDate ] = useState(
-		meta.event_recurrence_end || ''
-	);
-
-	useEffect( () => {
-		setRecurrenceEndDate( meta.event_recurrence_end || '' );
-	}, [ meta.event_recurrence_end ] );
-
-	useEffect( () => {
-		if ( meta.event_recurrence === 'single' ) {
-			setDisplayRecurrence( false );
-			setDisplayEndDate( !! meta.event_end_date );
-		} else if ( meta.event_recurrence === 'custom' ) {
-			setDisplayRecurrence( true );
-			setDisplayEndDate( false );
-		} else {
-			setDisplayRecurrence( true );
-			setDisplayEndDate( !! meta.event_recurrence_end );
-		}
-	}, [
-		meta.event_recurrence,
-		meta.event_recurrence_end,
-		meta.event_end_date,
-	] );
-
 	const handleRecurrenceEndDateChange = ( value ) => {
-		setRecurrenceEndDate( value );
 		updateMeta( 'event_recurrence_end', value );
+	};
+
+	const validateEndDate = ( startDate, endDate ) => {
+		if ( startDate && endDate ) {
+			const startDateObj = new Date( startDate );
+			const endDateObj = new Date( endDate );
+			startDateObj.setHours( 0, 0, 0, 0 );
+			endDateObj.setHours( 0, 0, 0, 0 );
+
+			if ( endDateObj < startDateObj ) {
+				return __(
+					'End date cannot be before the start date.',
+					'events'
+				);
+			}
+		}
+		return null;
 	};
 
 	return (
 		<PluginDocumentSettingPanel
 			name="event-details"
-			title={ __( 'Event Details', 'pulsar' ) }
+			title={ __( 'Event Details', 'events' ) }
 			className="event-details"
 		>
 			<VStack>
 				<TextControl
-					label={ __( 'Location', 'pulsar' ) }
+					label={ __( 'Location', 'events' ) }
 					value={ meta.event_location || '' }
 					onChange={ ( value ) =>
 						updateMeta( 'event_location', value )
@@ -107,49 +106,100 @@ const EventDetailsPanel = () => {
 				/>
 
 				<TextControl
-					label={ __( 'Time', 'pulsar' ) }
+					label={ __( 'Time', 'events' ) }
 					value={ meta?.event_time || '' }
-					onChange={ ( value ) =>
-						setMeta( {
-							...meta,
-							event_time: value,
-						} )
-					}
+					onChange={ ( value ) => updateMeta( 'event_time', value ) }
 				/>
 
-				<SelectControl
-					label={ __( 'Event Recurrence', 'pulsar' ) }
-					value={ meta.event_recurrence || 'single' }
-					options={ [
-						{ value: 'single', label: __( 'Single', 'pulsar' ) },
-						{ value: 'weekly', label: __( 'Weekly', 'pulsar' ) },
-						{ value: 'monthly', label: __( 'Monthly', 'pulsar' ) },
-						{ value: 'custom', label: __( 'Custom', 'pulsar' ) },
-					] }
-					onChange={ ( value ) => {
-						updateMeta( 'event_recurrence', value );
+				{ meta.event_recurrence !== 'custom' && (
+					<>
+						<TextControl
+							label={ __( 'Event Date', 'events' ) }
+							type="date"
+							value={ meta?.event_date || '' }
+							onChange={ ( value ) =>
+								updateMeta( 'event_date', value )
+							}
+						/>
 
-						if ( value === 'single' ) {
-							setDisplayRecurrence( false );
-							setDisplayEndDate( false );
-						} else if ( value === 'custom' ) {
-							setDisplayRecurrence( true );
-							setDisplayEndDate( false );
-						} else {
-							setDisplayRecurrence( true );
-							setDisplayEndDate( true );
+						<TextControl
+							label={ __( 'Event End Date', 'events' ) }
+							help={ __(
+								'For single-day events, the end date does not need to be set (only for events spanning more than 1 day).',
+								'events'
+							) }
+							type="date"
+							value={ meta?.event_end_date || '' }
+							onChange={ ( value ) => {
+								const error = validateEndDate(
+									meta.event_date,
+									value
+								);
+								setEndDateError( error );
+								if ( ! error ) {
+									updateMeta( 'event_end_date', value );
+								}
+							} }
+						/>
+
+						{ endDateError && (
+							<p className="notice notice-error">
+								{ endDateError }
+							</p>
+						) }
+					</>
+				) }
+
+				<ToggleControl
+					label={ __( 'Repeat event', 'events' ) }
+					checked={ displayRecurrence }
+					onChange={ ( value ) => {
+						setDisplayRecurrence( value );
+
+						if ( ! value ) {
+							updateMeta( 'event_recurrence', 'single' );
+						} else if ( meta.event_recurrence === 'single' ) {
+							updateMeta( 'event_recurrence', 'weekly' );
 						}
 					} }
 				/>
+
 				{ displayRecurrence && (
 					<>
+						<SelectControl
+							label={ __( 'Event Recurrence', 'events' ) }
+							value={ meta.event_recurrence || 'single' }
+							options={ [
+								{
+									value: 'weekly',
+									label: __( 'Weekly', 'events' ),
+								},
+								{
+									value: 'monthly',
+									label: __( 'Monthly', 'events' ),
+								},
+								{
+									value: 'custom',
+									label: __( 'Custom', 'events' ),
+								},
+							] }
+							onChange={ ( value ) => {
+								updateMeta( 'event_recurrence', value );
+								if ( value === 'custom' ) {
+									setDisplayRecurrence( true );
+								} else {
+									setDisplayRecurrence( true );
+								}
+							} }
+						/>
+
 						{ meta.event_recurrence === 'custom' && (
 							<>
 								<p>
 									<strong>
 										{ __(
 											'Custom Repeat Dates',
-											'pulsar'
+											'events'
 										) }
 									</strong>
 								</p>
@@ -173,7 +223,7 @@ const EventDetailsPanel = () => {
 											<TextControl
 												label={ __(
 													'Start Date:',
-													'pulsar'
+													'events'
 												) }
 												type="date"
 												value={ item.start || '' }
@@ -187,7 +237,7 @@ const EventDetailsPanel = () => {
 											<TextControl
 												label={ __(
 													'End Date:',
-													'pulsar'
+													'events'
 												) }
 												type="date"
 												value={ item.end || '' }
@@ -202,7 +252,7 @@ const EventDetailsPanel = () => {
 												variant="secondary"
 												onClick={ removeItem }
 											>
-												{ __( 'Remove', 'pulsar' ) }
+												{ __( 'Remove', 'events' ) }
 											</Button>
 										</div>
 									) }
@@ -214,47 +264,19 @@ const EventDetailsPanel = () => {
 
 				{ meta.event_recurrence !== 'custom' && (
 					<>
-						<TextControl
-							label={ __( 'Event Date', 'pulsar' ) }
-							type="date"
-							value={ meta?.event_date || '' }
-							onChange={ ( value ) =>
-								setMeta( {
-									...meta,
-									event_date: value,
-								} )
-							}
-						/>
-
-						<TextControl
-							label={ __( 'Event End Date', 'pulsar' ) }
-							help={ __(
-								'For single-day events, the end date does not need to be set (only for events spanning more than 1 day).',
-								'pulsar'
-							) }
-							type="date"
-							value={ meta?.event_end_date || '' }
-							onChange={ ( value ) =>
-								setMeta( {
-									...meta,
-									event_end_date: value,
-								} )
-							}
-						/>
-
 						{ ( meta.event_recurrence === 'weekly' ||
 							meta.event_recurrence === 'monthly' ) && (
 							<TextControl
 								label={ __(
 									'Recurring Event Series Ends On',
-									'pulsar'
+									'events'
 								) }
 								help={ __(
 									'* Required or events will not display on calendar',
-									'pulsar'
+									'events'
 								) }
 								type="date"
-								value={ recurrenceEndDate }
+								value={ meta.event_recurrence_end || '' }
 								onChange={ handleRecurrenceEndDateChange }
 							/>
 						) }
@@ -265,7 +287,7 @@ const EventDetailsPanel = () => {
 					nextEventDates.length > 0 && (
 						<>
 							<p style={ { fontWeight: 'bold', color: 'blue' } }>
-								{ __( 'Upcoming dates:', 'pulsar' ) }
+								{ __( 'Upcoming dates:', 'events' ) }
 							</p>
 
 							{ nextEventDates.map( ( date, index ) => {
@@ -305,7 +327,7 @@ const EventDetailsPanel = () => {
 										<strong>
 											{ __(
 												'Next Recurring Event Date',
-												'pulsar'
+												'events'
 											) }{ ' ' }
 											{ index + 1 }
 										</strong>
@@ -332,7 +354,7 @@ const EventDetailsPanel = () => {
 						return (
 							<p key={ index }>
 								<strong>
-									{ __( 'Custom Event Date', 'pulsar' ) }{ ' ' }
+									{ __( 'Custom Event Date', 'events' ) }{ ' ' }
 									{ index + 1 }:
 								</strong>{ ' ' }
 								{ formattedStartDate }
