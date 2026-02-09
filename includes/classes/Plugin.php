@@ -34,7 +34,10 @@ class Plugin {
 	 * @return void
 	 */
 	public static function activation(): void {
-		// Intentionally empty (kept for forward compatibility).
+		Event::instance()->register();
+		EventCategory::instance()->register();
+
+		flush_rewrite_rules();
 	}
 
 	/**
@@ -43,6 +46,6 @@ class Plugin {
 	 * @return void
 	 */
 	public static function deactivation(): void {
-		// Intentionally empty (kept for forward compatibility).
+		flush_rewrite_rules();
 	}
 }
