@@ -25,6 +25,7 @@ class Plugin {
 		EventCategory::instance()->boot();
 		Event::instance()->boot();
 		Blocks::instance()->boot();
+		BlockBindings::instance()->boot();
 		Enqueue::instance()->boot();
 	}
 

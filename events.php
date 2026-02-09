@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Events
  * Description:       Add and display events on your WordPress site.
- * Requires at least: 6.3
+ * Requires at least: 6.5
  * Requires PHP:      7.4
  * Version:           0.1.0
  * Author:            eighteen73 Web Team
