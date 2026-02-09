@@ -1,46 +1,62 @@
 <?php
 /**
- * Singleton trait
+ * Singleton trait.
  *
  * @package Events
  */
 
 namespace Eighteen73\Events;
 
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Singleton trait.
+ */
 trait Singleton {
 
 	/**
-	 * The class instance
+	 * The class instance.
 	 *
-	 * @var self|null
+	 * @var self|null Single instance of this class.
 	 */
 	private static $instance = null;
 
 	/**
-	 * Get the current instance
+	 * Cloning is forbidden.
 	 *
-	 * @return Singleton
+	 * @return void
+	 */
+	public function __clone() {
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning is forbidden.', 'events' ), false );
+	}
+
+	/**
+	 * Unserializing instances of this class is forbidden.
+	 *
+	 * @return void
+	 */
+	public function __wakeup() {
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'events' ), false );
+	}
+
+	/**
+	 * Constructor.
+	 */
+	private function __construct() {
+		// Intentionally empty.
+	}
+
+	/**
+	 * Get the current instance.
+	 *
+	 * Ensures only one instance can be loaded.
+	 *
+	 * @return self Single instance of this class.
 	 */
 	final public static function instance(): self {
 		if ( self::$instance === null ) {
 			self::$instance = new self();
 		}
 		return self::$instance;
-	}
-
-	/**
-	 * Constructor
-	 */
-	private function __construct() {
-		// Intentionally empty
-	}
-
-	/**
-	 * Class clone
-	 *
-	 * @return void
-	 */
-	private function __clone() {
-		// Intentionally empty
 	}
 }

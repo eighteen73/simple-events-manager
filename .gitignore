@@ -1,34 +1,50 @@
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea
+.vscode/*
+
+# Sass
+.sass-cache/
+
 # Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+logs/
 
-# Coverage directory used by tools like istanbul
-coverage
+# Environment files
+wp-cli.local.yml
+yarn-error.log
+npm-debug.log
+.pnpm-debug.log
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directories
-node_modules/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Output of `npm pack`
-*.tgz
-
-# Output of `wp-scripts plugin-zip`
+# Build files
+*.sql
+*.swp
 *.zip
 
-# dotenv environment variables file
-.env
+# Built packages
+build/
+build-module/
+build-style/
+build-types/
+dist/
 
+# Project files
+node_modules/
 vendor/
 
-.DS_Store
+# TypeScript files
+tsconfig.tsbuildinfo
+
+# wp-env config
+.wp-env.override.json
+
+# Unit tests
+tmp/
+
+# Composer
+vendor/
+bin/composer/**/vendor/
+lib/vendor/

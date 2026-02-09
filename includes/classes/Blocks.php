@@ -35,8 +35,11 @@ class Blocks {
 		$blocks_directory = trailingslashit( EVENTS_PATH . 'build/blocks' );
 
 		// Register all the blocks in the plugin.
-		if ( file_exists( $blocks_directory ) ) {
+		if ( is_dir( $blocks_directory ) ) {
 			$block_json_files = glob( $blocks_directory . '*/block.json' );
+			if ( false === $block_json_files ) {
+				return;
+			}
 
 			// auto register all blocks that were found.
 			foreach ( $block_json_files as $filename ) {

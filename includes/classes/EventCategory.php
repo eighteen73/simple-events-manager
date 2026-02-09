@@ -36,17 +36,33 @@ class EventCategory {
 	 * @return void
 	 */
 	public function register(): void {
-		register_extended_taxonomy(
-			$this->name,
-			[ 'event' ],
-			[
-				'show_in_rest' => true,
+		$labels = [
+			'name'              => __( 'Categories', 'events' ),
+			'singular_name'     => __( 'Category', 'events' ),
+			'search_items'      => __( 'Search Categories', 'events' ),
+			'all_items'         => __( 'All Categories', 'events' ),
+			'parent_item'       => __( 'Parent Category', 'events' ),
+			'parent_item_colon' => __( 'Parent Category:', 'events' ),
+			'edit_item'         => __( 'Edit Category', 'events' ),
+			'update_item'       => __( 'Update Category', 'events' ),
+			'add_new_item'      => __( 'Add New Category', 'events' ),
+			'new_item_name'     => __( 'New Category Name', 'events' ),
+			'menu_name'         => __( 'Categories', 'events' ),
+		];
+
+		$args = [
+			'labels'            => $labels,
+			'public'            => true,
+			'hierarchical'      => true,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'show_in_rest'      => true,
+			'rewrite'           => [
+				'slug'       => 'event-category',
+				'with_front' => false,
 			],
-			[
-				'singular' => 'Category',
-				'plural'   => 'Categories',
-				'slug'     => 'event-category',
-			]
-		);
+		];
+
+		register_taxonomy( $this->name, [ 'event' ], $args );
 	}
 }

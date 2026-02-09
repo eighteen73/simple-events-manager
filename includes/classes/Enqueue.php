@@ -7,6 +7,8 @@
 
 namespace Eighteen73\Events;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Enqueue scripts, styles and fonts.
  */
@@ -29,11 +31,14 @@ class Enqueue {
 	 * @return void
 	 */
 	public function editor_scripts(): void {
+		$asset_path = EVENTS_PATH . 'build/js/editor.asset.php';
+		$asset      = file_exists( $asset_path ) ? require $asset_path : null;
+
 		wp_enqueue_script(
 			'events-editor-scripts',
 			EVENTS_URL . 'build/js/editor.js',
-			[],
-			[],
+			$asset['dependencies'],
+			$asset['version'],
 			[
 				'in_footer' => true,
 			],

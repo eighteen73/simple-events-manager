@@ -18,9 +18,9 @@ const { name } = json;
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-registerBlockType( name, {
+registerBlockType(name, {
 	/**
 	 * @see ./edit.js
 	 */
 	edit: Edit,
-} );
+});

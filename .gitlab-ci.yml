@@ -1,7 +1,0 @@
-stages:
-  - test
-  - publish
-
-include:
-  - component: $CI_SERVER_FQDN/ci/wordpress/test-plugin@1
-  - component: $CI_SERVER_FQDN/ci/wordpress/publish-plugin-gitlab@1
