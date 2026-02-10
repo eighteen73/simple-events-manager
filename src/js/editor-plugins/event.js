@@ -31,11 +31,11 @@ const EventDetailsPanel = () => {
 	};
 
 	const nextEventDates = (() => {
-		if (!meta?.event_date || meta.event_recurrence === 'single') {
+		if (!meta?.event_start_date || meta.event_recurrence === 'single') {
 			return [];
 		}
 
-		const startDate = new Date(meta.event_date);
+		const startDate = new Date(meta.event_start_date);
 		const endDate = meta.event_recurrence_end
 			? new Date(meta.event_recurrence_end)
 			: null;
@@ -90,19 +90,25 @@ const EventDetailsPanel = () => {
 				/>
 
 				<TextControl
-					label={__('Time', 'events')}
-					value={meta?.event_time || ''}
-					onChange={(value) => updateMeta('event_time', value)}
+					label={__('Start Time', 'events')}
+					value={meta?.event_start_time || ''}
+					onChange={(value) => updateMeta('event_start_time', value)}
+				/>
+
+				<TextControl
+					label={__('End Time', 'events')}
+					value={meta?.event_end_time || ''}
+					onChange={(value) => updateMeta('event_end_time', value)}
 				/>
 
 				{meta.event_recurrence !== 'custom' && (
 					<>
 						<TextControl
-							label={__('Event Date', 'events')}
+							label={__('Event Start Date', 'events')}
 							type="date"
-							value={meta?.event_date || ''}
+							value={meta?.event_start_date || ''}
 							onChange={(value) =>
-								updateMeta('event_date', value)
+								updateMeta('event_start_date', value)
 							}
 						/>
 
@@ -116,7 +122,7 @@ const EventDetailsPanel = () => {
 							value={meta?.event_end_date || ''}
 							onChange={(value) => {
 								const error = validateEndDate(
-									meta.event_date,
+									meta.event_start_date,
 									value
 								);
 								setEndDateError(error);
@@ -276,9 +282,12 @@ const EventDetailsPanel = () => {
 
 								let durationInDays = 1;
 
-								if (meta.event_date && meta.event_end_date) {
+								if (
+									meta.event_start_date &&
+									meta.event_end_date
+								) {
 									const originalStart = new Date(
-										meta.event_date
+										meta.event_start_date
 									);
 									const originalEnd = new Date(
 										meta.event_end_date
