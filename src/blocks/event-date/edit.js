@@ -4,10 +4,13 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import {
-	PanelBody,
 	SelectControl,
 	TextControl,
 	ToggleControl,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanel as ToolsPanel,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -66,15 +69,17 @@ function formatPreviewDate(dateStr, format) {
 		'Friday',
 		'Saturday',
 	];
+	// Replace numeric/single-char tokens first so we don't replace 'd' or 'n'
+	// inside weekday/month names (e.g. "Wednesday", "February").
 	const out = format
+		.replace('Y', d.getFullYear())
+		.replace('m', pad(d.getMonth() + 1))
+		.replace('n', String(d.getMonth() + 1))
+		.replace('j', String(d.getDate()))
+		.replace('d', pad(d.getDate()))
 		.replace('F', monthsFull[d.getMonth()])
 		.replace('M', months[d.getMonth()])
-		.replace('l', days[d.getDay()])
-		.replace('Y', d.getFullYear())
-		.replace('j', d.getDate())
-		.replace('d', pad(d.getDate()))
-		.replace('m', pad(d.getMonth() + 1))
-		.replace('n', d.getMonth() + 1);
+		.replace('l', days[d.getDay()]);
 	return out;
 }
 
@@ -164,51 +169,110 @@ export default function Edit({ attributes, context, setAttributes }) {
 	) : (
 		preview
 	);
+	const resetAll = () =>
+		setAttributes({
+			format: 'j M Y',
+			customFormat: '',
+			showEndDate: true,
+			showTime: true,
+			showEndTime: true,
+			isLink: false,
+		});
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={__('Event Date Settings', 'events')}>
-					<SelectControl
+				<ToolsPanel
+					label={__('Settings', 'events')}
+					resetAll={resetAll}
+				>
+					<ToolsPanelItem
+						hasValue={() => format !== 'j M Y' || !!customFormat}
 						label={__('Format', 'events')}
-						value={format}
-						options={FORMAT_PRESETS}
-						onChange={(value) => setAttributes({ format: value })}
-					/>
-					{format === 'custom' && (
-						<TextControl
-							label={__('Custom format', 'events')}
-							help={__('PHP date format (e.g. j M Y)', 'events')}
-							value={customFormat}
+						onDeselect={() =>
+							setAttributes({ format: 'j M Y', customFormat: '' })
+						}
+						isShownByDefault
+					>
+						<SelectControl
+							label={__('Format', 'events')}
+							value={format}
+							options={FORMAT_PRESETS}
 							onChange={(value) =>
-								setAttributes({ customFormat: value ?? '' })
+								setAttributes({ format: value })
 							}
 						/>
-					)}
-					<ToggleControl
+						{format === 'custom' && (
+							<TextControl
+								label={__('Custom format', 'events')}
+								help={__(
+									'PHP date format (e.g. j M Y)',
+									'events'
+								)}
+								value={customFormat}
+								onChange={(value) =>
+									setAttributes({ customFormat: value ?? '' })
+								}
+							/>
+						)}
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !showEndDate}
 						label={__('Show end date', 'events')}
-						checked={showEndDate}
-						onChange={(value) =>
-							setAttributes({ showEndDate: value })
-						}
-					/>
-					<ToggleControl
+						onDeselect={() => setAttributes({ showEndDate: true })}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={__('Show end date', 'events')}
+							checked={showEndDate}
+							onChange={(value) =>
+								setAttributes({ showEndDate: value })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !showTime}
 						label={__('Show time', 'events')}
-						checked={showTime}
-						onChange={(value) => setAttributes({ showTime: value })}
-					/>
-					<ToggleControl
+						onDeselect={() => setAttributes({ showTime: true })}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={__('Show time', 'events')}
+							checked={showTime}
+							onChange={(value) =>
+								setAttributes({ showTime: value })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !showEndTime}
 						label={__('Show end time', 'events')}
-						checked={showEndTime}
-						onChange={(value) =>
-							setAttributes({ showEndTime: value })
-						}
-					/>
-					<ToggleControl
+						onDeselect={() => setAttributes({ showEndTime: true })}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={__('Show end time', 'events')}
+							checked={showEndTime}
+							onChange={(value) =>
+								setAttributes({ showEndTime: value })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !!isLink}
 						label={__('Link to event', 'events')}
-						checked={isLink}
-						onChange={(value) => setAttributes({ isLink: value })}
-					/>
-				</PanelBody>
+						onDeselect={() => setAttributes({ isLink: false })}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={__('Link to event', 'events')}
+							checked={isLink}
+							onChange={(value) =>
+								setAttributes({ isLink: value })
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div {...blockProps}>
 				<time dateTime={startDate}>{content}</time>

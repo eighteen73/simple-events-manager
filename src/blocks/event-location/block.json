@@ -8,20 +8,24 @@
 	"textdomain": "events",
 	"icon": "location",
 	"attributes": {
-		"prefix": {
-			"type": "string",
-			"default": ""
-		},
-		"suffix": {
-			"type": "string",
-			"default": ""
-		}
+		"prefix": { "type": "string", "default": "" },
+		"suffix": { "type": "string", "default": "" }
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"color": true,
-		"typography": true,
+		"typography": {
+			"fontSize": true,
+			"fontFamily": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"lineHeight": true,
+			"textDecoration": true,
+			"textTransform": true,
+			"textAlign": true
+		},
 		"spacing": true
 	},
 	"editorScript": "file:./index.js",

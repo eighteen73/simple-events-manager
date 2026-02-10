@@ -8,36 +8,28 @@
 	"textdomain": "events",
 	"icon": "calendar",
 	"attributes": {
-		"format": {
-			"type": "string",
-			"default": "j M Y"
-		},
-		"customFormat": {
-			"type": "string",
-			"default": ""
-		},
-		"showEndDate": {
-			"type": "boolean",
-			"default": true
-		},
-		"showTime": {
-			"type": "boolean",
-			"default": true
-		},
-		"showEndTime": {
-			"type": "boolean",
-			"default": true
-		},
-		"isLink": {
-			"type": "boolean",
-			"default": false
-		}
+		"format": { "type": "string", "default": "j M Y" },
+		"customFormat": { "type": "string", "default": "" },
+		"showEndDate": { "type": "boolean", "default": true },
+		"showTime": { "type": "boolean", "default": true },
+		"showEndTime": { "type": "boolean", "default": true },
+		"isLink": { "type": "boolean", "default": false }
 	},
-	"usesContext": ["postId", "postType"],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"color": true,
-		"typography": true,
+		"typography": {
+			"fontSize": true,
+			"fontFamily": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"lineHeight": true,
+			"textDecoration": true,
+			"textTransform": true,
+			"textAlign": true
+		},
 		"spacing": true
 	},
 	"editorScript": "file:./index.js",

@@ -4,11 +4,14 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import {
-	PanelBody,
+	RangeControl,
 	SelectControl,
 	TextControl,
 	ToggleControl,
-	RangeControl,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanel as ToolsPanel,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -169,15 +172,17 @@ function formatPreviewDate(dateStr, format) {
 		'Friday',
 		'Saturday',
 	];
+	// Replace numeric/single-char tokens first so we don't replace 'd' or 'n'
+	// inside weekday/month names (e.g. "Wednesday", "February").
 	return format
+		.replace('Y', d.getFullYear())
+		.replace('m', pad(d.getMonth() + 1))
+		.replace('n', String(d.getMonth() + 1))
+		.replace('j', String(d.getDate()))
+		.replace('d', pad(d.getDate()))
 		.replace('F', monthsFull[d.getMonth()])
 		.replace('M', months[d.getMonth()])
-		.replace('l', days[d.getDay()])
-		.replace('Y', d.getFullYear())
-		.replace('j', d.getDate())
-		.replace('d', pad(d.getDate()))
-		.replace('m', pad(d.getMonth() + 1))
-		.replace('n', d.getMonth() + 1);
+		.replace('l', days[d.getDay()]);
 }
 
 export default function Edit({ attributes, context, setAttributes }) {
@@ -277,52 +282,98 @@ export default function Edit({ attributes, context, setAttributes }) {
 		);
 	}
 
+	const resetAll = () =>
+		setAttributes({
+			format: 'j M Y',
+			customFormat: '',
+			maxItems: 0,
+			showEndDate: false,
+			isLink: false,
+		});
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={__('Event Dates Settings', 'events')}>
-					<SelectControl
+				<ToolsPanel
+					label={__('Settings', 'events')}
+					resetAll={resetAll}
+				>
+					<ToolsPanelItem
+						hasValue={() => format !== 'j M Y' || !!customFormat}
 						label={__('Format', 'events')}
-						value={format}
-						options={FORMAT_PRESETS}
-						onChange={(value) => setAttributes({ format: value })}
-					/>
-					{format === 'custom' && (
-						<TextControl
-							label={__('Custom format', 'events')}
-							help={__('PHP date format (e.g. j M Y)', 'events')}
-							value={customFormat}
+						onDeselect={() =>
+							setAttributes({ format: 'j M Y', customFormat: '' })
+						}
+						isShownByDefault
+					>
+						<SelectControl
+							label={__('Format', 'events')}
+							value={format}
+							options={FORMAT_PRESETS}
 							onChange={(value) =>
-								setAttributes({ customFormat: value ?? '' })
+								setAttributes({ format: value })
 							}
 						/>
-					)}
-					<RangeControl
-						label={__('Maximum items', 'events')}
-						help={__(
-							'0 = show all. Limits how many dates are shown.',
-							'events'
+						{format === 'custom' && (
+							<TextControl
+								label={__('Custom format', 'events')}
+								help={__(
+									'PHP date format (e.g. j M Y)',
+									'events'
+								)}
+								value={customFormat}
+								onChange={(value) =>
+									setAttributes({ customFormat: value ?? '' })
+								}
+							/>
 						)}
-						value={maxItems}
-						onChange={(value) =>
-							setAttributes({ maxItems: value ?? 0 })
-						}
-						min={0}
-						max={50}
-					/>
-					<ToggleControl
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => maxItems !== 0}
+						label={__('Maximum items', 'events')}
+						onDeselect={() => setAttributes({ maxItems: 0 })}
+					>
+						<RangeControl
+							label={__('Maximum items', 'events')}
+							help={__(
+								'0 = show all. Limits how many dates are shown.',
+								'events'
+							)}
+							value={maxItems}
+							onChange={(value) =>
+								setAttributes({ maxItems: value ?? 0 })
+							}
+							min={0}
+							max={50}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !!showEndDate}
 						label={__('Show end date', 'events')}
-						checked={showEndDate}
-						onChange={(value) =>
-							setAttributes({ showEndDate: value })
-						}
-					/>
-					<ToggleControl
+						onDeselect={() => setAttributes({ showEndDate: false })}
+					>
+						<ToggleControl
+							label={__('Show end date', 'events')}
+							checked={showEndDate}
+							onChange={(value) =>
+								setAttributes({ showEndDate: value })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !!isLink}
 						label={__('Link to event', 'events')}
-						checked={isLink}
-						onChange={(value) => setAttributes({ isLink: value })}
-					/>
-				</PanelBody>
+						onDeselect={() => setAttributes({ isLink: false })}
+					>
+						<ToggleControl
+							label={__('Link to event', 'events')}
+							checked={isLink}
+							onChange={(value) =>
+								setAttributes({ isLink: value })
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div {...blockProps}>
 				<ul

@@ -3,7 +3,14 @@
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { PanelBody, SelectControl, Spinner } from '@wordpress/components';
+import {
+	SelectControl,
+	Spinner,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanel as ToolsPanel,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -119,25 +126,37 @@ export default function Edit({ attributes, setAttributes }) {
 		);
 	}
 
+	const resetAll = () => setAttributes({ eventCategory: '' });
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={__('Event Settings', 'events')}>
-					{isLoadingCategories ? (
-						<Spinner />
-					) : (
-						<SelectControl
-							label={__('Select Event Category', 'events')}
-							value={eventCategory}
-							options={categories}
-							onChange={(selectedCategory) =>
-								setAttributes({
-									eventCategory: selectedCategory,
-								})
-							}
-						/>
-					)}
-				</PanelBody>
+				<ToolsPanel
+					label={__('Settings', 'events')}
+					resetAll={resetAll}
+				>
+					<ToolsPanelItem
+						hasValue={() => !!eventCategory}
+						label={__('Event category', 'events')}
+						onDeselect={() => setAttributes({ eventCategory: '' })}
+						isShownByDefault
+					>
+						{isLoadingCategories ? (
+							<Spinner />
+						) : (
+							<SelectControl
+								label={__('Select Event Category', 'events')}
+								value={eventCategory}
+								options={categories}
+								onChange={(selectedCategory) =>
+									setAttributes({
+										eventCategory: selectedCategory,
+									})
+								}
+							/>
+						)}
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 
 			<div {...blockProps}>

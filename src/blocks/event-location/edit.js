@@ -3,7 +3,13 @@
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { PanelBody, TextControl } from '@wordpress/components';
+import {
+	TextControl,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanel as ToolsPanel,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit({ attributes, context, setAttributes }) {
@@ -72,30 +78,50 @@ export default function Edit({ attributes, context, setAttributes }) {
 		);
 	}
 
+	const resetAll = () => setAttributes({ prefix: '', suffix: '' });
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={__('Event Location Settings', 'events')}>
-					<TextControl
+				<ToolsPanel
+					label={__('Settings', 'events')}
+					resetAll={resetAll}
+				>
+					<ToolsPanelItem
+						hasValue={() => !!prefix}
 						label={__('Prefix', 'events')}
-						help={__(
-							'Optional text before the location (e.g. "Venue:")',
-							'events'
-						)}
-						value={prefix}
-						onChange={(value) =>
-							setAttributes({ prefix: value ?? '' })
-						}
-					/>
-					<TextControl
+						onDeselect={() => setAttributes({ prefix: '' })}
+					>
+						<TextControl
+							label={__('Prefix', 'events')}
+							help={__(
+								'Optional text before the location (e.g. "Venue:")',
+								'events'
+							)}
+							value={prefix}
+							onChange={(value) =>
+								setAttributes({ prefix: value ?? '' })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={() => !!suffix}
 						label={__('Suffix', 'events')}
-						help={__('Optional text after the location', 'events')}
-						value={suffix}
-						onChange={(value) =>
-							setAttributes({ suffix: value ?? '' })
-						}
-					/>
-				</PanelBody>
+						onDeselect={() => setAttributes({ suffix: '' })}
+					>
+						<TextControl
+							label={__('Suffix', 'events')}
+							help={__(
+								'Optional text after the location',
+								'events'
+							)}
+							value={suffix}
+							onChange={(value) =>
+								setAttributes({ suffix: value ?? '' })
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<span {...blockProps}>{display}</span>
 		</>
