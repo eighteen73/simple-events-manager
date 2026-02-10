@@ -10,8 +10,6 @@
 
 namespace Eighteen73\Events;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Event occurrences helper.
  */
@@ -37,7 +35,7 @@ class EventOccurrences {
 	public static function get_occurrences_for_post( int $post_id, string $post_type = 'event' ): array {
 		$prefix = $post_type . '_';
 
-		$event_start_date_meta = get_post_meta( $post_id, $prefix . 'date', true );
+		$event_start_date_meta = get_post_meta( $post_id, $prefix . 'start_date', true );
 		if ( ! is_string( $event_start_date_meta ) || $event_start_date_meta === '' ) {
 			return [];
 		}

@@ -29,6 +29,8 @@ class Event {
 	public function boot(): void {
 		add_action( 'init', [ $this, 'register' ] );
 		add_action( 'init', [ $this, 'meta' ] );
+		add_filter( 'rest_event_collection_params', [ $this, 'rest_event_collection_params' ], 10, 1 );
+		add_filter( 'rest_event_query', [ $this, 'rest_event_query' ], 10, 2 );
 	}
 
 	/**
@@ -106,7 +108,7 @@ class Event {
 
 		register_post_meta(
 			$this->name,
-			"{$this->name}_time",
+			"{$this->name}_start_date",
 			[
 				'show_in_rest'      => true,
 				'single'            => true,
@@ -117,7 +119,7 @@ class Event {
 
 		register_post_meta(
 			$this->name,
-			"{$this->name}_date",
+			"{$this->name}_start_time",
 			[
 				'show_in_rest'      => true,
 				'single'            => true,
@@ -129,6 +131,17 @@ class Event {
 		register_post_meta(
 			$this->name,
 			"{$this->name}_end_date",
+			[
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+		);
+
+		register_post_meta(
+			$this->name,
+			"{$this->name}_end_time",
 			[
 				'show_in_rest'      => true,
 				'single'            => true,
@@ -185,5 +198,47 @@ class Event {
 				'sanitize_callback' => 'sanitize_text_field',
 			],
 		);
+	}
+
+	/**
+	 * Allow ordering by event_start_date in REST API (for Query block editor preview).
+	 *
+	 * @param array<string, mixed> $params REST collection params.
+	 * @return array<string, mixed>
+	 */
+	public function rest_event_collection_params( array $params ): array {
+		if ( isset( $params['orderby']['enum'] ) && is_array( $params['orderby']['enum'] ) ) {
+			$params['orderby']['enum'][] = 'event_start_date';
+		}
+		return $params;
+	}
+
+	/**
+	 * When orderby=event_start_date, use meta_value and filter to single/occurrence posts only.
+	 *
+	 * @param array            $args    WP_Query args.
+	 * @param \WP_REST_Request $request REST request.
+	 * @return array
+	 */
+	public function rest_event_query( array $args, \WP_REST_Request $request ): array {
+		$orderby = $request->get_param( 'orderby' );
+		if ( $orderby !== 'event_start_date' ) {
+			return $args;
+		}
+		$args['meta_key'] = 'event_start_date';
+		$args['orderby']  = 'meta_value';
+		$args['order']    = strtoupper( (string) ( $request->get_param( 'order' ) ?? 'asc' ) ) === 'DESC' ? 'DESC' : 'ASC';
+		// Same as front end: only single events and occurrence children.
+		$existing   = $args['meta_query'] ?? [];
+		$recurrence = [
+			'key'   => 'event_recurrence',
+			'value' => 'single',
+		];
+		if ( ! empty( $existing ) && is_array( $existing ) ) {
+			$args['meta_query'] = array_merge( [ $recurrence ], $existing );
+		} else {
+			$args['meta_query'] = [ $recurrence ];
+		}
+		return $args;
 	}
 }

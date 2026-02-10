@@ -24,8 +24,8 @@ class Plugin {
 	public function setup(): void {
 		EventCategory::instance()->boot();
 		Event::instance()->boot();
+		OccurrenceSync::instance()->boot();
 		Blocks::instance()->boot();
-		BlockBindings::instance()->boot();
 		Enqueue::instance()->boot();
 	}
 
