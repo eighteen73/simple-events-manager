@@ -16,14 +16,6 @@ import {
 import { __ } from '@wordpress/i18n';
 
 const DEFAULT_RECURRENCE_YEARS = 1;
-const FORMAT_PRESETS = [
-	{ value: 'F j, Y', label: __('February 10, 2026', 'events') },
-	{ value: 'j M Y', label: __('10 Feb 2026', 'events') },
-	{ value: 'Y-m-d', label: __('2026–02–10', 'events') },
-	{ value: 'l, F j, Y', label: __('Tuesday, February 10, 2026', 'events') },
-	{ value: 'M j', label: __('Feb 10', 'events') },
-	{ value: 'custom', label: __('Custom', 'events') },
-];
 
 function normalizeRecurrenceType(type) {
 	const allowed = ['single', 'weekly', 'monthly', 'custom'];
@@ -185,6 +177,20 @@ function formatPreviewDate(dateStr, format) {
 		.replace('l', days[d.getDay()]);
 }
 
+function getFormatPresets() {
+	const now = new Date();
+	const pad = (n) => (n < 10 ? '0' + n : '' + n);
+	const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+	return [
+		{ value: 'F j, Y', label: formatPreviewDate(todayStr, 'F j, Y') },
+		{ value: 'j M Y', label: formatPreviewDate(todayStr, 'j M Y') },
+		{ value: 'Y-m-d', label: formatPreviewDate(todayStr, 'Y-m-d') },
+		{ value: 'l, F j, Y', label: formatPreviewDate(todayStr, 'l, F j, Y') },
+		{ value: 'M j', label: formatPreviewDate(todayStr, 'M j') },
+		{ value: 'custom', label: __('Custom', 'events') },
+	];
+}
+
 export default function Edit({ attributes, context, setAttributes }) {
 	const { format, customFormat, maxItems, showEndDate, isLink } = attributes;
 	const postId = context?.postId;
@@ -309,7 +315,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 						<SelectControl
 							label={__('Format', 'events')}
 							value={format}
-							options={FORMAT_PRESETS}
+							options={getFormatPresets()}
 							onChange={(value) =>
 								setAttributes({ format: value })
 							}
