@@ -3,4 +3,4 @@
  */
 
 // Each variation should have it's own file.
-import './paragraph';
+import './query';
