@@ -268,6 +268,7 @@ class OccurrenceSync {
 
 	/**
 	 * When a parent event is trashed, trash its occurrence children.
+	 * Unhooks self (and transition_post_status) during the loop so trashing children does not re-enter.
 	 *
 	 * @param int $post_id Post ID.
 	 * @return void
@@ -278,8 +279,22 @@ class OccurrenceSync {
 			return;
 		}
 		$children = $this->get_children( $post_id );
-		foreach ( $children as $child_id ) {
-			wp_trash_post( $child_id );
+		if ( empty( $children ) ) {
+			return;
+		}
+		// Prevent re-entry when we trash each child (avoids recursion and plugin errors).
+		remove_action( 'trashed_post', [ $this, 'trash_children_when_parent_trashed' ], 10 );
+		remove_action( 'transition_post_status', [ $this, 'sync_children_status' ], 10 );
+		try {
+			foreach ( $children as $child_id ) {
+				$child = get_post( $child_id );
+				if ( $child && $child->post_status !== 'trash' ) {
+					wp_trash_post( (int) $child_id );
+				}
+			}
+		} finally {
+			add_action( 'trashed_post', [ $this, 'trash_children_when_parent_trashed' ], 10, 1 );
+			add_action( 'transition_post_status', [ $this, 'sync_children_status' ], 10, 3 );
 		}
 	}
 
@@ -375,5 +390,76 @@ class OccurrenceSync {
 		} else {
 			$query->set( 'meta_query', [ $occurrence_clause ] );
 		}
+	}
+
+	/**
+	 * Get post IDs of occurrence children whose parent is missing or trashed (orphans).
+	 *
+	 * @return int[]
+	 */
+	public function get_orphaned_occurrence_ids(): array {
+		$query         = new \WP_Query(
+			[
+				'post_type'      => 'event',
+				'post_status'    => 'any',
+				'fields'         => 'ids',
+				'posts_per_page' => -1,
+				'no_found_rows'  => true,
+				'meta_query'     => [
+					[
+						'key'   => self::OCCURRENCE_META_KEY,
+						'value' => '1',
+					],
+				],
+			]
+		);
+		$candidate_ids = $query->posts ?? [];
+		$orphans       = [];
+		foreach ( $candidate_ids as $id ) {
+			$post = get_post( (int) $id );
+			if ( ! $post || $post->post_type !== 'event' ) {
+				continue;
+			}
+			$parent_id = (int) $post->post_parent;
+			if ( $parent_id <= 0 ) {
+				$orphans[] = (int) $id;
+				continue;
+			}
+			$parent = get_post( $parent_id );
+			if ( ! $parent || $parent->post_type !== 'event' || $parent->post_status === 'trash' ) {
+				$orphans[] = (int) $id;
+			}
+		}
+		return $orphans;
+	}
+
+	/**
+	 * Permanently delete orphaned occurrence posts.
+	 *
+	 * @return int Number of posts deleted.
+	 */
+	public function delete_orphaned_occurrences(): int {
+		$ids    = $this->get_orphaned_occurrence_ids();
+		$count  = 0;
+		$self   = $this;
+		$remove = function () use ( $self ) {
+			remove_action( 'before_delete_post', [ $self, 'delete_children_before_parent' ], 10 );
+		};
+		$add    = function () use ( $self ) {
+			add_action( 'before_delete_post', [ $self, 'delete_children_before_parent' ], 10, 2 );
+		};
+		$remove();
+		try {
+			foreach ( $ids as $id ) {
+				$post = get_post( $id );
+				if ( $post && $post->post_type === 'event' ) {
+					wp_delete_post( $id, true );
+					++$count;
+				}
+			}
+		} finally {
+			$add();
+		}
+		return $count;
 	}
 }
