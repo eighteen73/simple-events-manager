@@ -1,0 +1,41 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "eighteen73/event-dates",
+	"title": "Event Dates",
+	"category": "widgets",
+	"description": "Lists upcoming occurrence dates for the current event.",
+	"textdomain": "events",
+	"icon": "calendar-alt",
+	"attributes": {
+		"format": {
+			"type": "string",
+			"default": "j M Y"
+		},
+		"customFormat": {
+			"type": "string",
+			"default": ""
+		},
+		"maxItems": {
+			"type": "number",
+			"default": 0
+		},
+		"showEndDate": {
+			"type": "boolean",
+			"default": false
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"usesContext": ["postId", "postType"],
+	"supports": {
+		"html": false,
+		"color": true,
+		"typography": true,
+		"spacing": true
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

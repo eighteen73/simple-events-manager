@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "eighteen73/event-location",
+	"title": "Event Location",
+	"category": "widgets",
+	"description": "Displays the event location.",
+	"textdomain": "events",
+	"icon": "location",
+	"attributes": {
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"color": true,
+		"typography": true,
+		"spacing": true
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

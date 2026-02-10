@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "eighteen73/event-date",
+	"title": "Event Date",
+	"category": "widgets",
+	"description": "Displays the event start and end date (and optional time) with configurable format.",
+	"textdomain": "events",
+	"icon": "calendar",
+	"attributes": {
+		"format": {
+			"type": "string",
+			"default": "j M Y"
+		},
+		"customFormat": {
+			"type": "string",
+			"default": ""
+		},
+		"showEndDate": {
+			"type": "boolean",
+			"default": true
+		},
+		"showTime": {
+			"type": "boolean",
+			"default": true
+		},
+		"showEndTime": {
+			"type": "boolean",
+			"default": true
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"usesContext": ["postId", "postType"],
+	"supports": {
+		"html": false,
+		"color": true,
+		"typography": true,
+		"spacing": true
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

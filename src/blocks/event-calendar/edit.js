@@ -12,143 +12,39 @@ import { __ } from '@wordpress/i18n';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
-const DEFAULT_RECURRENCE_YEARS = 1;
-
 /**
- * Normalize recurrence type from meta.
+ * Map REST events (single events + occurrence children) to calendar events.
+ * Each post is one occurrence; use event_start_date / event_end_date directly.
  *
- * @param {string} type - Raw recurrence value.
- * @return {string} One of 'single', 'weekly', 'monthly', 'custom'.
+ * @param {Array} rawEvents - REST event objects (should be filtered to recurrence === 'single').
+ * @return {Array<{ title: string, start: string, end: string }>} FullCalendar event objects.
  */
-function normalizeRecurrenceType(type) {
-	const allowed = ['single', 'weekly', 'monthly', 'custom'];
-	return typeof type === 'string' && allowed.includes(type) ? type : 'single';
-}
-
-/**
- * Expand one event from REST into calendar occurrences (mirrors PHP EventOccurrences logic).
- *
- * @param {Object} event - REST event object with meta.
- * @return {Array<{ title: string, start: string, end: string, url?: string }>} Occurrences.
- */
-function expandEventToOccurrences(event) {
-	const meta = event.meta || {};
-	const title = event.title?.rendered || '';
-	const url = event.link || '';
-
-	const startMeta = meta.event_date;
-	if (!startMeta) {
-		return [];
-	}
-
-	const endMeta = meta.event_end_date || startMeta;
-	const recurrenceType = normalizeRecurrenceType(meta.event_recurrence);
-	const recurrenceEndMeta = meta.event_recurrence_end || null;
-	const customDates = Array.isArray(meta.event_custom_dates)
-		? meta.event_custom_dates
-		: [];
-
+function eventsToCalendarList(rawEvents) {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	const toDate = (str) => {
-		const d = new Date(str);
-		d.setHours(0, 0, 0, 0);
-		return d;
-	};
-
-	const formatISO = (d) => d.toISOString().slice(0, 19).replace('T', ' ');
-
-	const startDate = toDate(startMeta);
-	const endDate = new Date(startDate);
-	endDate.setHours(23, 59, 59);
-	if (endMeta !== startMeta) {
-		const endParsed = new Date(endMeta);
-		endParsed.setHours(23, 59, 59);
-		endDate.setTime(endParsed.getTime());
-	}
-
-	const occurrences = [];
-
-	if (recurrenceType === 'single') {
-		if (endDate >= today) {
-			occurrences.push({
-				title,
-				start: startMeta,
-				end: endMeta,
-				url,
-			});
-		}
-		return occurrences;
-	}
-
-	if (recurrenceType === 'weekly' || recurrenceType === 'monthly') {
-		const recurrenceEnd = recurrenceEndMeta
-			? toDate(recurrenceEndMeta)
-			: new Date(startDate);
-		if (!recurrenceEndMeta) {
-			recurrenceEnd.setFullYear(
-				recurrenceEnd.getFullYear() + DEFAULT_RECURRENCE_YEARS
-			);
-		}
-
-		const currentStart = new Date(startDate);
-		const currentEnd = new Date(endDate);
-
-		while (currentStart <= recurrenceEnd) {
-			if (currentEnd >= today) {
-				occurrences.push({
-					title,
-					start: formatISO(currentStart),
-					end: formatISO(currentEnd),
-					url,
-				});
-			}
-			if (recurrenceType === 'weekly') {
-				currentStart.setDate(currentStart.getDate() + 7);
-				currentEnd.setDate(currentEnd.getDate() + 7);
-			} else {
-				currentStart.setMonth(currentStart.getMonth() + 1);
-				currentEnd.setMonth(currentEnd.getMonth() + 1);
-			}
-		}
-		return occurrences;
-	}
-
-	if (recurrenceType === 'custom') {
-		for (const item of customDates) {
-			const itemStart = item?.start;
-			if (!itemStart) {
-				continue;
-			}
-			const itemEnd = item?.end || itemStart;
-			const itemEndDate = new Date(itemEnd);
-			itemEndDate.setHours(23, 59, 59);
-			if (itemEndDate >= today) {
-				occurrences.push({
-					title,
-					start: itemStart,
-					end: itemEnd,
-					url,
-				});
-			}
-		}
-		return occurrences;
-	}
-
-	return occurrences;
-}
-
-/**
- * Flatten REST events into FullCalendar event list with recurrence expanded.
- *
- * @param {Array} events - REST event objects.
- * @return {Array} FullCalendar event objects.
- */
-function flattenEventsToCalendar(events) {
 	const result = [];
-	for (const event of events) {
-		result.push(...expandEventToOccurrences(event));
+	for (const event of rawEvents) {
+		const meta = event.meta || {};
+		const recurrence = meta.event_recurrence;
+		if (recurrence !== 'single') {
+			continue;
+		}
+		const startMeta = meta.event_start_date;
+		if (!startMeta) {
+			continue;
+		}
+		const endMeta = meta.event_end_date || startMeta;
+		const endDate = new Date(endMeta);
+		endDate.setHours(23, 59, 59);
+		if (endDate < today) {
+			continue;
+		}
+		result.push({
+			title: event.title?.rendered || '',
+			start: startMeta,
+			end: endMeta,
+		});
 	}
 	return result;
 }
@@ -200,9 +96,7 @@ export default function Edit({ attributes, setAttributes }) {
 			.then((response) => response.json())
 			.then((data) => {
 				const rawEvents = Array.isArray(data) ? data : [];
-				const expanded = flattenEventsToCalendar(rawEvents);
-				// Omit url so events are not clickable in the editor.
-				setEvents(expanded.map(({ url: _unused, ...event }) => event));
+				setEvents(eventsToCalendarList(rawEvents));
 			})
 			.catch((error) => {
 				setErrorText(error);
