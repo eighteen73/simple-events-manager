@@ -37,18 +37,16 @@ class OccurrenceSync {
 		add_action( 'pre_get_posts', [ $this, 'hide_occurrences_from_admin_list' ], 10, 1 );
 		add_action( 'load-post.php', [ $this, 'redirect_occurrence_edit_to_parent' ], 5, 0 );
 		add_action( 'pre_get_posts', [ $this, 'front_end_show_occurrences_only' ], 10, 1 );
-		add_filter( 'query_loop_block_query_vars', [ $this, 'events_query_loop_order_by_start_date' ], 10, 3 );
+		add_filter( 'query_loop_block_query_vars', [ $this, 'events_query_loop_order_by_start_date' ], 10, 1 );
 	}
 
 	/**
 	 * For the Events Query Loop variation, order by event_start_date (meta) and ensure event_recurrence = single.
 	 *
-	 * @param array     $query Query vars for WP_Query.
-	 * @param \WP_Block $block Query block instance.
-	 * @param int       $page  Current page.
+	 * @param array $query Query vars for WP_Query.
 	 * @return array Modified query vars.
 	 */
-	public function events_query_loop_order_by_start_date( array $query, \WP_Block $block, int $page ): array {
+	public function events_query_loop_order_by_start_date( array $query ): array {
 		if ( ( $query['post_type'] ?? '' ) !== 'event' ) {
 			return $query;
 		}
