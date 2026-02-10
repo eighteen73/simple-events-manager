@@ -9,6 +9,8 @@
  * @package Pulsar
  */
 
+use Eighteen73\Events\EventOccurrences;
+
 $post_type      = 'event';
 $event_category = $attributes['eventCategory'];
 $parent_post_id = isset( $attributes['postParent'] ) ? [ $attributes['postParent'] ] : [];
@@ -42,124 +44,13 @@ $events = [];
 
 while ( $events_query->have_posts() ) {
 	$events_query->the_post();
-
-	$today = gmdate( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
-
-	$event_start_date_meta = get_post_meta( get_the_ID(), $post_type . '_date', true );
-	$event_start_date      = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' midnight' ) );
-
-	$event_end_date_meta = get_post_meta( get_the_ID(), $post_type . '_end_date', true ) !== '' ? get_post_meta( get_the_ID(), $post_type . '_end_date', true ) : $event_start_date_meta;
-	$event_end_date      = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' midnight + 1 day - 1 second' ) );
-
-	$recurrence_type          = get_post_meta( get_the_ID(), $post_type . '_recurrence', true );
-	$recurrence_end_date_meta = get_post_meta( get_the_ID(), $post_type . '_recurrence_end', true );
-	$recurrence_end_date      = $recurrence_end_date_meta ? gmdate( 'Y-m-d H:i:s', strtotime( $recurrence_end_date_meta . '  + 1 day midnight - 1 second' ) ) : null;
-
-	$custom_dates = get_post_meta( get_the_ID(), $post_type . '_custom_dates', true );
-
-	switch ( $recurrence_type ) {
-		case 'weekly':
-			if ( ! $recurrence_end_date ) {
-				break;
-			}
-			$i = 0;
-
-			do {
-				$next_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . ( 7 * $i ) . ' days midnight' ) );
-				$next_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . ( 7 * $i ) . ' days midnight + 1 day - 1 second' ) );
-
-				if (
-					strtotime( $next_end_date ) >= strtotime( $today )
-					&&
-					strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
-				) {
-					$events[] = [
-						'title' => get_the_title(),
-						'url'   => get_the_permalink(),
-						'start' => $next_start_date,
-						'end'   => $next_end_date,
-					];
-				}
-
-				++$i;
-
-			} while (
-
-				( strtotime( $next_start_date ) <= strtotime( $recurrence_end_date ) )
-			);
-			break;
-
-		case 'monthly':
-			if ( ! $recurrence_end_date ) {
-				break;
-			}
-			$i = 0;
-
-			do {
-				$next_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . $i . ' month midnight' ) );
-				$next_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . $i . ' month midnight + 1 day - 1 second' ) );
-
-				if (
-					strtotime( $next_end_date ) >= strtotime( $today )
-					&&
-					strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
-				) {
-					$events[] = [
-						'title' => get_the_title(),
-						'url'   => get_the_permalink(),
-						'start' => $next_start_date,
-						'end'   => $next_end_date,
-					];
-				}
-
-				++$i;
-
-			} while (
-
-				( strtotime( $next_start_date ) <= strtotime( $recurrence_end_date ) )
-			);
-			break;
-		case 'custom':
-			if ( ! empty( $custom_dates ) ) {
-
-				foreach ( $custom_dates as $custom_date ) {
-
-					if ( ! $custom_date['start'] ) {
-						continue;
-					}
-
-					$start = isset( $custom_date['start'] ) ? gmdate( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . 'midnight' ) ) : '';
-
-					$end = ! empty( $custom_date['end'] )
-						? gmdate( 'Y-m-d H:i:s', strtotime( $custom_date['end'] . '  23:59:59' ) )
-						: gmdate( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . '  23:59:59' ) );
-
-					if ( $start ) {
-						if ( strtotime( $end ) >= strtotime( 'today' ) ) {
-							$events[] = [
-								'title' => get_the_title(),
-								'url'   => get_the_permalink(),
-								'start' => $start,
-								'end'   => $end,
-							];
-						}
-					}
-				}
-			}
-			break;
-
-		default:
-			if ( strtotime( $event_end_date ) >= strtotime( $today ) ) {
-				$events[] = [
-					'title' => get_the_title(),
-					'url'   => get_the_permalink(),
-					'start' => $event_start_date,
-					'end'   => $event_end_date,
-				];
-			}
-			break;
+	$post_id     = get_the_ID();
+	$occurrences = EventOccurrences::get_occurrences_for_post( $post_id, $post_type );
+	foreach ( $occurrences as $occurrence ) {
+		$events[] = $occurrence;
 	}
 }
+
 wp_reset_postdata();
 ?>
 
