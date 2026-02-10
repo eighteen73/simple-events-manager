@@ -47,8 +47,9 @@ class EventOccurrences {
 			$event_end_date_meta = $event_start_date_meta;
 		}
 
-		$event_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' midnight' ) );
-		$event_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' midnight + 1 day - 1 second' ) );
+		// Use date() (server timezone) so DST does not shift the calendar day (e.g. Apr 10 midnight stays 10th).
+		$event_start_date = date( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' midnight' ) );
+		$event_end_date   = date( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' midnight + 1 day - 1 second' ) );
 
 		$recurrence_type = get_post_meta( $post_id, $prefix . 'recurrence', true );
 		$recurrence_type = self::normalize_recurrence_type( $recurrence_type );
@@ -56,7 +57,7 @@ class EventOccurrences {
 		$recurrence_end_date_meta = get_post_meta( $post_id, $prefix . 'recurrence_end', true );
 		$recurrence_end_date      = null;
 		if ( is_string( $recurrence_end_date_meta ) && $recurrence_end_date_meta !== '' ) {
-			$recurrence_end_date = gmdate( 'Y-m-d H:i:s', strtotime( $recurrence_end_date_meta . ' + 1 day midnight - 1 second' ) );
+			$recurrence_end_date = date( 'Y-m-d H:i:s', strtotime( $recurrence_end_date_meta . ' + 1 day midnight - 1 second' ) );
 		}
 
 		$custom_dates = get_post_meta( $post_id, $post_type . '_custom_dates', true );
@@ -64,7 +65,7 @@ class EventOccurrences {
 			$custom_dates = [];
 		}
 
-		$today = gmdate( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
+		$today = date( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
 		$title = get_the_title( $post_id );
 		$url   = get_permalink( $post_id );
 
@@ -124,8 +125,8 @@ class EventOccurrences {
 				$recurrence_end_date = $recurrence_end_date ?? self::default_recurrence_end( $event_start_date );
 				$i                   = 0;
 				do {
-					$next_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . ( 7 * $i ) . ' days midnight' ) );
-					$next_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . ( 7 * $i ) . ' days midnight + 1 day - 1 second' ) );
+					$next_start_date = date( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . ( 7 * $i ) . ' days midnight' ) );
+					$next_end_date   = date( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . ( 7 * $i ) . ' days midnight + 1 day - 1 second' ) );
 					if (
 						strtotime( $next_end_date ) >= strtotime( $today )
 						&& strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
@@ -145,8 +146,10 @@ class EventOccurrences {
 				$recurrence_end_date = $recurrence_end_date ?? self::default_recurrence_end( $event_start_date );
 				$i                   = 0;
 				do {
-					$next_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . $i . ' month midnight' ) );
-					$next_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . $i . ' month midnight + 1 day - 1 second' ) );
+					$ts_start_raw    = strtotime( $event_start_date . ' + ' . $i . ' month midnight' );
+					$ts_end_raw      = strtotime( $event_end_date . ' + ' . $i . ' month midnight + 1 day - 1 second' );
+					$next_start_date = date( 'Y-m-d H:i:s', $ts_start_raw );
+					$next_end_date   = date( 'Y-m-d H:i:s', $ts_end_raw );
 					if (
 						strtotime( $next_end_date ) >= strtotime( $today )
 						&& strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
@@ -167,10 +170,10 @@ class EventOccurrences {
 					if ( empty( $custom_date['start'] ) || ! is_string( $custom_date['start'] ) ) {
 						continue;
 					}
-					$start = gmdate( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . ' midnight' ) );
+					$start = date( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . ' midnight' ) );
 					$end   = ! empty( $custom_date['end'] ) && is_string( $custom_date['end'] )
-						? gmdate( 'Y-m-d H:i:s', strtotime( $custom_date['end'] . ' 23:59:59' ) )
-						: gmdate( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . ' 23:59:59' ) );
+						? date( 'Y-m-d H:i:s', strtotime( $custom_date['end'] . ' 23:59:59' ) )
+						: date( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . ' 23:59:59' ) );
 					if ( strtotime( $end ) >= strtotime( $today ) ) {
 						$events[] = [
 							'title' => $title,
@@ -204,6 +207,6 @@ class EventOccurrences {
 	 * @return string Recurrence end Y-m-d H:i:s.
 	 */
 	private static function default_recurrence_end( string $event_start_date ): string {
-		return gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . self::DEFAULT_RECURRENCE_YEARS . ' year' ) );
+		return date( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . self::DEFAULT_RECURRENCE_YEARS . ' year' ) );
 	}
 }
