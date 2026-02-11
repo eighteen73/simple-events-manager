@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Events
+ * Plugin Name:       Simple Events Manager
  * Description:       Add and display events on your WordPress site.
  * Requires at least: 6.5
  * Requires PHP:      7.4
@@ -9,22 +9,22 @@
  * Author URI:        https://eighteen73.co.uk
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       events
+ * Text Domain:       simple-events-manager
  *
- * @package           Events
+ * @package           SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 defined( 'ABSPATH' ) || exit;
 
 // Useful global constants.
-define( 'EVENTS_URL', plugin_dir_url( __FILE__ ) );
-define( 'EVENTS_PATH', plugin_dir_path( __FILE__ ) );
-define( 'EVENTS_INC', EVENTS_PATH . 'includes/' );
+define( 'SIMPLE_EVENTS_MANAGER_URL', plugin_dir_url( __FILE__ ) );
+define( 'SIMPLE_EVENTS_MANAGER_PATH', plugin_dir_path( __FILE__ ) );
+define( 'SIMPLE_EVENTS_MANAGER_INC', SIMPLE_EVENTS_MANAGER_PATH . 'includes/' );
 
 // Require the autoloader.
-$autoloader = EVENTS_PATH . 'vendor/autoload.php';
+$autoloader = SIMPLE_EVENTS_MANAGER_PATH . 'vendor/autoload.php';
 
 if ( file_exists( $autoloader ) ) {
 	require_once $autoloader;
@@ -34,10 +34,10 @@ if ( file_exists( $autoloader ) ) {
 		function () {
 			printf(
 				'<div class="notice notice-error"><p><strong>%s</strong>: %s</p></div>',
-				esc_html__( 'Events', 'events' ),
+				esc_html__( 'Simple Events Manager', 'simple-events-manager' ),
 				sprintf(
 					/* translators: %s: composer install command */
-					esc_html__( 'Composer dependencies not found. Please run %s to install required dependencies.', 'events' ),
+					esc_html__( 'Composer dependencies not found. Please run %s to install required dependencies.', 'simple-events-manager' ),
 					'composer install'
 				)
 			);

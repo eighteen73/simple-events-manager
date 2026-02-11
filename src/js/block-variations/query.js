@@ -4,19 +4,21 @@
 import { registerBlockVariation } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
-const EVENTS_QUERY_NAMESPACE = 'eighteen73/events-query';
+const SIMPLE_EVENTS_MANAGER_QUERY_NAMESPACE =
+	'simple-events-manager/events-query';
 
 registerBlockVariation('core/query', {
-	name: EVENTS_QUERY_NAMESPACE,
-	title: __('Events', 'events'),
+	name: SIMPLE_EVENTS_MANAGER_QUERY_NAMESPACE,
+	title: __('Events', 'simple-events-manager'),
 	description: __(
 		'Displays a list of events, ordered by start date (one per occurrence).',
-		'events'
+		'simple-events-manager'
 	),
 	icon: 'calendar-alt',
-	isActive: ({ namespace }) => namespace === EVENTS_QUERY_NAMESPACE,
+	isActive: ({ namespace }) =>
+		namespace === SIMPLE_EVENTS_MANAGER_QUERY_NAMESPACE,
 	attributes: {
-		namespace: EVENTS_QUERY_NAMESPACE,
+		namespace: SIMPLE_EVENTS_MANAGER_QUERY_NAMESPACE,
 		query: {
 			perPage: 10,
 			pages: 0,
@@ -35,7 +37,7 @@ registerBlockVariation('core/query', {
 		[
 			'core/post-template',
 			{},
-			[['core/post-title'], ['eighteen73/event-date']],
+			[['core/post-title'], ['simple-events-manager/event-date']],
 		],
 		['core/query-pagination'],
 		['core/query-no-results'],

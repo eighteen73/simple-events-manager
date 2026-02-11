@@ -2,10 +2,10 @@
 /**
  * Registers "Event Category" taxonomy
  *
- * @package Pulsar
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 /**
  * "Event Category" registration class
@@ -36,32 +36,38 @@ class EventCategory {
 	 * @return void
 	 */
 	public function register(): void {
-		$labels = [
-			'name'              => __( 'Categories', 'events' ),
-			'singular_name'     => __( 'Category', 'events' ),
-			'search_items'      => __( 'Search Categories', 'events' ),
-			'all_items'         => __( 'All Categories', 'events' ),
-			'parent_item'       => __( 'Parent Category', 'events' ),
-			'parent_item_colon' => __( 'Parent Category:', 'events' ),
-			'edit_item'         => __( 'Edit Category', 'events' ),
-			'update_item'       => __( 'Update Category', 'events' ),
-			'add_new_item'      => __( 'Add New Category', 'events' ),
-			'new_item_name'     => __( 'New Category Name', 'events' ),
-			'menu_name'         => __( 'Categories', 'events' ),
-		];
+		$labels = apply_filters(
+			'simple_events_manager_event_category_labels',
+			[
+				'name'              => __( 'Categories', 'simple-events-manager' ),
+				'singular_name'     => __( 'Category', 'simple-events-manager' ),
+				'search_items'      => __( 'Search Categories', 'simple-events-manager' ),
+				'all_items'         => __( 'All Categories', 'simple-events-manager' ),
+				'parent_item'       => __( 'Parent Category', 'simple-events-manager' ),
+				'parent_item_colon' => __( 'Parent Category:', 'simple-events-manager' ),
+				'edit_item'         => __( 'Edit Category', 'simple-events-manager' ),
+				'update_item'       => __( 'Update Category', 'simple-events-manager' ),
+				'add_new_item'      => __( 'Add New Category', 'simple-events-manager' ),
+				'new_item_name'     => __( 'New Category Name', 'simple-events-manager' ),
+				'menu_name'         => __( 'Categories', 'simple-events-manager' ),
+			]
+		);
 
-		$args = [
-			'labels'            => $labels,
-			'public'            => true,
-			'hierarchical'      => true,
-			'show_ui'           => true,
-			'show_admin_column' => true,
-			'show_in_rest'      => true,
-			'rewrite'           => [
-				'slug'       => 'event-category',
-				'with_front' => false,
-			],
-		];
+		$args = apply_filters(
+			'simple_events_manager_event_category_args',
+			[
+				'labels'            => $labels,
+				'public'            => true,
+				'hierarchical'      => true,
+				'show_ui'           => true,
+				'show_admin_column' => true,
+				'show_in_rest'      => true,
+				'rewrite'           => [
+					'slug'       => 'event-category',
+					'with_front' => false,
+				],
+			]
+		);
 
 		register_taxonomy( $this->name, [ 'event' ], $args );
 	}

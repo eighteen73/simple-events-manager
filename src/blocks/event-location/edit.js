@@ -63,7 +63,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 				<em>
 					{__(
 						'Event Location (select an event or use inside Query Loop)',
-						'events'
+						'simple-events-manager'
 					)}
 				</em>
 			</div>
@@ -74,7 +74,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		return (
 			<div {...blockProps}>
 				<span className="event-location-placeholder">
-					{__('Loading…', 'events')}
+					{__('Loading…', 'simple-events-manager')}
 				</span>
 			</div>
 		);
@@ -84,7 +84,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		return (
 			<div {...blockProps}>
 				<span className="event-location-placeholder">
-					{__('No event location set', 'events')}
+					{__('No event location set', 'simple-events-manager')}
 				</span>
 			</div>
 		);
@@ -96,19 +96,19 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		<>
 			<InspectorControls>
 				<ToolsPanel
-					label={__('Settings', 'events')}
+					label={__('Settings', 'simple-events-manager')}
 					resetAll={resetAll}
 				>
 					<ToolsPanelItem
 						hasValue={() => !!prefix}
-						label={__('Prefix', 'events')}
+						label={__('Prefix', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ prefix: '' })}
 					>
 						<TextControl
-							label={__('Prefix', 'events')}
+							label={__('Prefix', 'simple-events-manager')}
 							help={__(
 								'Optional text before the location (e.g. "Venue:")',
-								'events'
+								'simple-events-manager'
 							)}
 							value={prefix}
 							onChange={(value) =>
@@ -118,14 +118,14 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !!suffix}
-						label={__('Suffix', 'events')}
+						label={__('Suffix', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ suffix: '' })}
 					>
 						<TextControl
-							label={__('Suffix', 'events')}
+							label={__('Suffix', 'simple-events-manager')}
 							help={__(
 								'Optional text after the location',
-								'events'
+								'simple-events-manager'
 							)}
 							value={suffix}
 							onChange={(value) =>
@@ -137,7 +137,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 			</InspectorControls>
 			<InspectorControls group="color">
 				<ColorControl
-					label={__('Icon', 'events')}
+					label={__('Icon', 'simple-events-manager')}
 					value={iconColor}
 					onChange={(value, slug) =>
 						setAttributes({ iconColor: slug ?? value ?? '' })

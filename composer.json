@@ -1,11 +1,11 @@
 {
-	"name": "eighteen73/events",
+	"name": "eighteen73/simple-events-manager",
 	"description": "Add and display events on your WordPress site.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"autoload": {
 		"psr-4": {
-			"Eighteen73\\Events\\": "includes/classes/"
+			"Eighteen73\\SimpleEventsManager\\": "includes/classes/"
 		}
 	},
 	"require": {

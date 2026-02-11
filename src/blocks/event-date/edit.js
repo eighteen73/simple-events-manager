@@ -86,7 +86,7 @@ function getFormatPresets() {
 		{ value: 'Y-m-d', label: formatPreviewDate(todayStr, 'Y-m-d') },
 		{ value: 'l, F j, Y', label: formatPreviewDate(todayStr, 'l, F j, Y') },
 		{ value: 'M j', label: formatPreviewDate(todayStr, 'M j') },
-		{ value: 'custom', label: __('Custom', 'events') },
+		{ value: 'custom', label: __('Custom', 'simple-events-manager') },
 	];
 }
 
@@ -165,7 +165,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 				<em>
 					{__(
 						'Event Date (select an event or use inside Query Loop)',
-						'events'
+						'simple-events-manager'
 					)}
 				</em>
 			</div>
@@ -176,7 +176,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		return (
 			<div {...blockProps}>
 				<span className="event-date-placeholder">
-					{__('Loading…', 'events')}
+					{__('Loading…', 'simple-events-manager')}
 				</span>
 			</div>
 		);
@@ -186,7 +186,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		return (
 			<div {...blockProps}>
 				<span className="event-date-placeholder">
-					{__('No event date set', 'events')}
+					{__('No event date set', 'simple-events-manager')}
 				</span>
 			</div>
 		);
@@ -211,19 +211,19 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		<>
 			<InspectorControls group="settings">
 				<ToolsPanel
-					label={__('Settings', 'events')}
+					label={__('Settings', 'simple-events-manager')}
 					resetAll={resetAll}
 				>
 					<ToolsPanelItem
 						hasValue={() => format !== 'j M Y' || !!customFormat}
-						label={__('Format', 'events')}
+						label={__('Format', 'simple-events-manager')}
 						onDeselect={() =>
 							setAttributes({ format: 'j M Y', customFormat: '' })
 						}
 						isShownByDefault
 					>
 						<SelectControl
-							label={__('Format', 'events')}
+							label={__('Format', 'simple-events-manager')}
 							value={format}
 							options={getFormatPresets()}
 							onChange={(value) =>
@@ -232,10 +232,13 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 						/>
 						{format === 'custom' && (
 							<TextControl
-								label={__('Custom format', 'events')}
+								label={__(
+									'Custom format',
+									'simple-events-manager'
+								)}
 								help={__(
 									'PHP date format (e.g. j M Y)',
-									'events'
+									'simple-events-manager'
 								)}
 								value={customFormat}
 								onChange={(value) =>
@@ -246,12 +249,12 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !showEndDate}
-						label={__('Show end date', 'events')}
+						label={__('Show end date', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ showEndDate: true })}
 						isShownByDefault
 					>
 						<ToggleControl
-							label={__('Show end date', 'events')}
+							label={__('Show end date', 'simple-events-manager')}
 							checked={showEndDate}
 							onChange={(value) =>
 								setAttributes({ showEndDate: value })
@@ -260,12 +263,12 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !showTime}
-						label={__('Show time', 'events')}
+						label={__('Show time', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ showTime: true })}
 						isShownByDefault
 					>
 						<ToggleControl
-							label={__('Show time', 'events')}
+							label={__('Show time', 'simple-events-manager')}
 							checked={showTime}
 							onChange={(value) =>
 								setAttributes({ showTime: value })
@@ -274,12 +277,12 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !showEndTime}
-						label={__('Show end time', 'events')}
+						label={__('Show end time', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ showEndTime: true })}
 						isShownByDefault
 					>
 						<ToggleControl
-							label={__('Show end time', 'events')}
+							label={__('Show end time', 'simple-events-manager')}
 							checked={showEndTime}
 							onChange={(value) =>
 								setAttributes({ showEndTime: value })
@@ -288,12 +291,12 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !!isLink}
-						label={__('Link to event', 'events')}
+						label={__('Link to event', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ isLink: false })}
 						isShownByDefault
 					>
 						<ToggleControl
-							label={__('Link to event', 'events')}
+							label={__('Link to event', 'simple-events-manager')}
 							checked={isLink}
 							onChange={(value) =>
 								setAttributes({ isLink: value })
@@ -304,7 +307,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 			</InspectorControls>
 			<InspectorControls group="color">
 				<ColorControl
-					label={__('Icon', 'events')}
+					label={__('Icon', 'simple-events-manager')}
 					value={iconColor}
 					onChange={(value, slug) =>
 						setAttributes({ iconColor: slug ?? value ?? '' })

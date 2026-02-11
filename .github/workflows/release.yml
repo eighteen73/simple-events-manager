@@ -19,4 +19,4 @@ jobs:
       release_branch: release
       run_composer_install: true
       built_asset_paths: build
-      plugin_file: events.php
+      plugin_file: simple-events-manager.php

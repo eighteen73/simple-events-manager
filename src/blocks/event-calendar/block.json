@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "eighteen73/event-calendar",
+	"name": "simple-events-manager/event-calendar",
 	"title": "Event Calendar",
 	"category": "widgets",
 	"description": "Displays events in a calendar.",

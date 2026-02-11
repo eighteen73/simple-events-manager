@@ -5,10 +5,10 @@
  * Used by the event calendar block so that single, weekly, monthly,
  * and custom recurrence rules produce the correct date range entries.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 /**
  * Event occurrences helper.

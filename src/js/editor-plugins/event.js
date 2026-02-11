@@ -69,7 +69,7 @@ const EventDetailsPanel = () => {
 			if (endDateObj < startDateObj) {
 				return __(
 					'End date cannot be before the start date.',
-					'events'
+					'simple-events-manager'
 				);
 			}
 		}
@@ -79,24 +79,24 @@ const EventDetailsPanel = () => {
 	return (
 		<PluginDocumentSettingPanel
 			name="event-details"
-			title={__('Event Details', 'events')}
+			title={__('Event Details', 'simple-events-manager')}
 			className="event-details"
 		>
 			<VStack>
 				<TextControl
-					label={__('Location', 'events')}
+					label={__('Location', 'simple-events-manager')}
 					value={meta.event_location || ''}
 					onChange={(value) => updateMeta('event_location', value)}
 				/>
 
 				<TextControl
-					label={__('Start Time', 'events')}
+					label={__('Start Time', 'simple-events-manager')}
 					value={meta?.event_start_time || ''}
 					onChange={(value) => updateMeta('event_start_time', value)}
 				/>
 
 				<TextControl
-					label={__('End Time', 'events')}
+					label={__('End Time', 'simple-events-manager')}
 					value={meta?.event_end_time || ''}
 					onChange={(value) => updateMeta('event_end_time', value)}
 				/>
@@ -104,7 +104,10 @@ const EventDetailsPanel = () => {
 				{meta.event_recurrence !== 'custom' && (
 					<>
 						<TextControl
-							label={__('Event Start Date', 'events')}
+							label={__(
+								'Event Start Date',
+								'simple-events-manager'
+							)}
 							type="date"
 							value={meta?.event_start_date || ''}
 							onChange={(value) =>
@@ -113,10 +116,13 @@ const EventDetailsPanel = () => {
 						/>
 
 						<TextControl
-							label={__('Event End Date', 'events')}
+							label={__(
+								'Event End Date',
+								'simple-events-manager'
+							)}
 							help={__(
 								'For single-day events, the end date does not need to be set (only for events spanning more than 1 day).',
-								'events'
+								'simple-events-manager'
 							)}
 							type="date"
 							value={meta?.event_end_date || ''}
@@ -141,7 +147,7 @@ const EventDetailsPanel = () => {
 				)}
 
 				<ToggleControl
-					label={__('Repeat event', 'events')}
+					label={__('Repeat event', 'simple-events-manager')}
 					checked={showRecurrenceControls}
 					onChange={(value) => {
 						if (!value) {
@@ -155,20 +161,32 @@ const EventDetailsPanel = () => {
 				{showRecurrenceControls && (
 					<>
 						<SelectControl
-							label={__('Event Recurrence', 'events')}
+							label={__(
+								'Event Recurrence',
+								'simple-events-manager'
+							)}
 							value={meta.event_recurrence || 'single'}
 							options={[
 								{
 									value: 'weekly',
-									label: __('Weekly', 'events'),
+									label: __(
+										'Weekly',
+										'simple-events-manager'
+									),
 								},
 								{
 									value: 'monthly',
-									label: __('Monthly', 'events'),
+									label: __(
+										'Monthly',
+										'simple-events-manager'
+									),
 								},
 								{
 									value: 'custom',
-									label: __('Custom', 'events'),
+									label: __(
+										'Custom',
+										'simple-events-manager'
+									),
 								},
 							]}
 							onChange={(value) => {
@@ -180,7 +198,10 @@ const EventDetailsPanel = () => {
 							<>
 								<p>
 									<strong>
-										{__('Custom Repeat Dates', 'events')}
+										{__(
+											'Custom Repeat Dates',
+											'simple-events-manager'
+										)}
 									</strong>
 								</p>
 								<AbstractRepeater
@@ -203,7 +224,7 @@ const EventDetailsPanel = () => {
 											<TextControl
 												label={__(
 													'Start Date:',
-													'events'
+													'simple-events-manager'
 												)}
 												type="date"
 												value={item.start || ''}
@@ -217,7 +238,7 @@ const EventDetailsPanel = () => {
 											<TextControl
 												label={__(
 													'End Date:',
-													'events'
+													'simple-events-manager'
 												)}
 												type="date"
 												value={item.end || ''}
@@ -232,7 +253,10 @@ const EventDetailsPanel = () => {
 												variant="secondary"
 												onClick={removeItem}
 											>
-												{__('Remove', 'events')}
+												{__(
+													'Remove',
+													'simple-events-manager'
+												)}
 											</Button>
 										</div>
 									)}
@@ -249,11 +273,11 @@ const EventDetailsPanel = () => {
 							<TextControl
 								label={__(
 									'Recurring Event Series Ends On',
-									'events'
+									'simple-events-manager'
 								)}
 								help={__(
 									'* Required or events will not display on calendar',
-									'events'
+									'simple-events-manager'
 								)}
 								type="date"
 								value={meta.event_recurrence_end || ''}
@@ -274,7 +298,7 @@ const EventDetailsPanel = () => {
 									color: 'var(--wp-admin-theme-color)',
 								}}
 							>
-								{__('Upcoming dates:', 'events')}
+								{__('Upcoming dates:', 'simple-events-manager')}
 							</p>
 
 							{nextEventDates.map((date, index) => {
@@ -316,7 +340,7 @@ const EventDetailsPanel = () => {
 										<strong>
 											{__(
 												'Next Recurring Event Date',
-												'events'
+												'simple-events-manager'
 											)}{' '}
 											{index + 1}
 										</strong>
@@ -343,7 +367,10 @@ const EventDetailsPanel = () => {
 						return (
 							<p key={index}>
 								<strong>
-									{__('Custom Event Date', 'events')}{' '}
+									{__(
+										'Custom Event Date',
+										'simple-events-manager'
+									)}{' '}
 									{index + 1}:
 								</strong>{' '}
 								{formattedStartDate}

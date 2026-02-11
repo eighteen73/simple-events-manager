@@ -6,7 +6,7 @@
  * @param string   $content      Block content.
  * @param WP_Block $block        Block instance.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
 $post_id = isset( $block->context['postId'] ) ? (int) $block->context['postId'] : 0;

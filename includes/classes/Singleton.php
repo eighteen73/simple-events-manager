@@ -2,10 +2,10 @@
 /**
  * Singleton trait.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,7 +27,7 @@ trait Singleton {
 	 * @return void
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning is forbidden.', 'events' ), false );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning is forbidden.', 'simple-events-manager' ), false );
 	}
 
 	/**
@@ -36,7 +36,7 @@ trait Singleton {
 	 * @return void
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'events' ), false );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'simple-events-manager' ), false );
 	}
 
 	/**

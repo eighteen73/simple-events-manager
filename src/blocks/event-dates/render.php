@@ -6,10 +6,10 @@
  * @param string   $content    Block content.
  * @param WP_Block $block      Block instance.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-use Eighteen73\Events\EventOccurrences;
+use Eighteen73\SimpleEventsManager\EventOccurrences;
 
 $post_id = isset( $block->context['postId'] ) ? (int) $block->context['postId'] : 0;
 if ( ! $post_id || get_post_type( $post_id ) !== 'event' ) {

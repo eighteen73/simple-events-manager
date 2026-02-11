@@ -7,7 +7,7 @@
  * @param string   $content        Rendered block output.
  * @param WP_Block $block_instance The instance of the WP_Block class.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
 $post_type      = 'event';

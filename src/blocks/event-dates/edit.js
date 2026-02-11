@@ -187,7 +187,7 @@ function getFormatPresets() {
 		{ value: 'Y-m-d', label: formatPreviewDate(todayStr, 'Y-m-d') },
 		{ value: 'l, F j, Y', label: formatPreviewDate(todayStr, 'l, F j, Y') },
 		{ value: 'M j', label: formatPreviewDate(todayStr, 'M j') },
-		{ value: 'custom', label: __('Custom', 'events') },
+		{ value: 'custom', label: __('Custom', 'simple-events-manager') },
 	];
 }
 
@@ -261,7 +261,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 				<em>
 					{__(
 						'Event Dates (select an event or use inside Query Loop)',
-						'events'
+						'simple-events-manager'
 					)}
 				</em>
 			</div>
@@ -272,7 +272,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 		return (
 			<div {...blockProps}>
 				<span className="event-dates-placeholder">
-					{__('Loading…', 'events')}
+					{__('Loading…', 'simple-events-manager')}
 				</span>
 			</div>
 		);
@@ -282,7 +282,10 @@ export default function Edit({ attributes, context, setAttributes }) {
 		return (
 			<div {...blockProps}>
 				<span className="event-dates-placeholder">
-					{__('No upcoming dates for this event', 'events')}
+					{__(
+						'No upcoming dates for this event',
+						'simple-events-manager'
+					)}
 				</span>
 			</div>
 		);
@@ -301,19 +304,19 @@ export default function Edit({ attributes, context, setAttributes }) {
 		<>
 			<InspectorControls>
 				<ToolsPanel
-					label={__('Settings', 'events')}
+					label={__('Settings', 'simple-events-manager')}
 					resetAll={resetAll}
 				>
 					<ToolsPanelItem
 						hasValue={() => format !== 'j M Y' || !!customFormat}
-						label={__('Format', 'events')}
+						label={__('Format', 'simple-events-manager')}
 						onDeselect={() =>
 							setAttributes({ format: 'j M Y', customFormat: '' })
 						}
 						isShownByDefault
 					>
 						<SelectControl
-							label={__('Format', 'events')}
+							label={__('Format', 'simple-events-manager')}
 							value={format}
 							options={getFormatPresets()}
 							onChange={(value) =>
@@ -322,10 +325,13 @@ export default function Edit({ attributes, context, setAttributes }) {
 						/>
 						{format === 'custom' && (
 							<TextControl
-								label={__('Custom format', 'events')}
+								label={__(
+									'Custom format',
+									'simple-events-manager'
+								)}
 								help={__(
 									'PHP date format (e.g. j M Y)',
-									'events'
+									'simple-events-manager'
 								)}
 								value={customFormat}
 								onChange={(value) =>
@@ -336,14 +342,14 @@ export default function Edit({ attributes, context, setAttributes }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => maxItems !== 0}
-						label={__('Maximum items', 'events')}
+						label={__('Maximum items', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ maxItems: 0 })}
 					>
 						<RangeControl
-							label={__('Maximum items', 'events')}
+							label={__('Maximum items', 'simple-events-manager')}
 							help={__(
 								'0 = show all. Limits how many dates are shown.',
-								'events'
+								'simple-events-manager'
 							)}
 							value={maxItems}
 							onChange={(value) =>
@@ -355,11 +361,11 @@ export default function Edit({ attributes, context, setAttributes }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !!showEndDate}
-						label={__('Show end date', 'events')}
+						label={__('Show end date', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ showEndDate: false })}
 					>
 						<ToggleControl
-							label={__('Show end date', 'events')}
+							label={__('Show end date', 'simple-events-manager')}
 							checked={showEndDate}
 							onChange={(value) =>
 								setAttributes({ showEndDate: value })
@@ -368,11 +374,11 @@ export default function Edit({ attributes, context, setAttributes }) {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !!isLink}
-						label={__('Link to event', 'events')}
+						label={__('Link to event', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ isLink: false })}
 					>
 						<ToggleControl
-							label={__('Link to event', 'events')}
+							label={__('Link to event', 'simple-events-manager')}
 							checked={isLink}
 							onChange={(value) =>
 								setAttributes({ isLink: value })

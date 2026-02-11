@@ -1,6 +1,5 @@
 {
-	"name": "events",
-	"version": "0.0.1",
+	"name": "simple-events-manager",
 	"description": "Add and display events on your WordPress site.",
 	"main": "index.js",
 	"scripts": {
@@ -21,7 +20,7 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"pot": "wp i18n make-pot . languages/events.pot --domain=events --exclude=node_modules,vendor,.git"
+		"pot": "wp i18n make-pot . languages/simple-events-manager.pot --domain=simple-events-manager --exclude=node_modules,vendor,.git"
 	},
 	"author": "eighteen73 Web Team",
 	"license": "GPL-2.0-or-later",

@@ -2,10 +2,10 @@
 /**
  * Theme assets enqueue.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,12 +31,12 @@ class Enqueue {
 	 * @return void
 	 */
 	public function editor_scripts(): void {
-		$asset_path = EVENTS_PATH . 'build/js/editor.asset.php';
+		$asset_path = SIMPLE_EVENTS_MANAGER_PATH . 'build/js/editor.asset.php';
 		$asset      = file_exists( $asset_path ) ? require $asset_path : null;
 
 		wp_enqueue_script(
-			'events-editor-scripts',
-			EVENTS_URL . 'build/js/editor.js',
+			'simple-events-manager-editor-scripts',
+			SIMPLE_EVENTS_MANAGER_URL . 'build/js/editor.js',
 			$asset['dependencies'],
 			$asset['version'],
 			[

@@ -175,7 +175,7 @@ export default function Edit({ attributes, setAttributes }) {
 				}));
 				setCategories([
 					{
-						label: __('All Categories', 'events'),
+						label: __('All Categories', 'simple-events-manager'),
 						value: '',
 					},
 					...formattedCategories,
@@ -215,7 +215,7 @@ export default function Edit({ attributes, setAttributes }) {
 				<p>
 					{__(
 						'Error loading events or categories, please try reloading the page.',
-						'events'
+						'simple-events-manager'
 					)}
 				</p>
 			</div>
@@ -228,12 +228,12 @@ export default function Edit({ attributes, setAttributes }) {
 		<>
 			<InspectorControls>
 				<ToolsPanel
-					label={__('Settings', 'events')}
+					label={__('Settings', 'simple-events-manager')}
 					resetAll={resetAll}
 				>
 					<ToolsPanelItem
 						hasValue={() => !!eventCategory}
-						label={__('Event category', 'events')}
+						label={__('Event category', 'simple-events-manager')}
 						onDeselect={() => setAttributes({ eventCategory: '' })}
 						isShownByDefault
 					>
@@ -241,7 +241,10 @@ export default function Edit({ attributes, setAttributes }) {
 							<Spinner />
 						) : (
 							<SelectControl
-								label={__('Select Event Category', 'events')}
+								label={__(
+									'Select Event Category',
+									'simple-events-manager'
+								)}
 								value={eventCategory}
 								options={categories}
 								onChange={(selectedCategory) =>
@@ -259,7 +262,7 @@ export default function Edit({ attributes, setAttributes }) {
 				{isLoadingEvents && <Spinner />}
 
 				{!isLoadingEvents && events.length === 0 && (
-					<p>{__('No events found.', 'events')}</p>
+					<p>{__('No events found.', 'simple-events-manager')}</p>
 				)}
 
 				{!isLoadingEvents && events.length > 0 && (

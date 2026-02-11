@@ -2,10 +2,10 @@
 /**
  * Main plugin class.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "eighteen73/event-location",
+	"name": "simple-events-manager/event-location",
 	"title": "Event Location",
 	"category": "widgets",
 	"description": "Displays the event location.",

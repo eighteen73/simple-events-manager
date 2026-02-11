@@ -2,10 +2,10 @@
 /**
  * Handles block registration.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 /**
  * Handles block registration.
@@ -32,7 +32,7 @@ class Blocks {
 	 * @see https://developer.wordpress.org/reference/functions/register_block_type/
 	 */
 	public function register(): void {
-		$blocks_directory = trailingslashit( EVENTS_PATH . 'build/blocks' );
+		$blocks_directory = trailingslashit( SIMPLE_EVENTS_MANAGER_PATH . 'build/blocks' );
 
 		// Register all the blocks in the plugin.
 		if ( is_dir( $blocks_directory ) ) {

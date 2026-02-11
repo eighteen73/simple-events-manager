@@ -6,10 +6,10 @@
  * child posts (one per occurrence) so the Query Loop can show one row per occurrence.
  * Children are invisible in admin and inherit all parent data except start/end date.
  *
- * @package Events
+ * @package SimpleEventsManager
  */
 
-namespace Eighteen73\Events;
+namespace Eighteen73\SimpleEventsManager;
 
 /**
  * Occurrence sync service.
