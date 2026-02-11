@@ -13,7 +13,8 @@
 		"showEndDate": { "type": "boolean", "default": true },
 		"showTime": { "type": "boolean", "default": true },
 		"showEndTime": { "type": "boolean", "default": true },
-		"isLink": { "type": "boolean", "default": false }
+		"isLink": { "type": "boolean", "default": false },
+		"iconColor": { "type": "string", "default": "" }
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
@@ -33,5 +34,6 @@
 		"spacing": true
 	},
 	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
 	"render": "file:./render.php"
 }

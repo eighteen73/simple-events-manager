@@ -9,7 +9,8 @@
 	"icon": "location",
 	"attributes": {
 		"prefix": { "type": "string", "default": "" },
-		"suffix": { "type": "string", "default": "" }
+		"suffix": { "type": "string", "default": "" },
+		"iconColor": { "type": "string", "default": "" }
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
@@ -29,5 +30,6 @@
 		"spacing": true
 	},
 	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
 	"render": "file:./render.php"
 }

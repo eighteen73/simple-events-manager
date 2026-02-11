@@ -14,6 +14,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import ColorControl from '../../js/components/color-control';
+
 function formatPreviewDate(dateStr, format) {
 	if (!dateStr) {
 		return '';
@@ -88,12 +90,18 @@ function getFormatPresets() {
 	];
 }
 
-export default function Edit({ attributes, context, setAttributes }) {
-	const { format, customFormat, showEndDate, showTime, showEndTime, isLink } =
-		attributes;
+export default function Edit({ attributes, context, setAttributes, clientId }) {
+	const {
+		format,
+		customFormat,
+		showEndDate,
+		showTime,
+		showEndTime,
+		isLink,
+		iconColor,
+	} = attributes;
 	const postId = context?.postId;
 	const postType = context?.postType;
-	const blockProps = useBlockProps();
 
 	const { meta, isLoading } = useSelect(
 		(select) => {
@@ -121,6 +129,21 @@ export default function Edit({ attributes, context, setAttributes }) {
 	const endDate = meta?.event_end_date ?? '';
 	const startTime = meta?.event_start_time ?? '';
 	const endTime = meta?.event_end_time ?? '';
+
+	const iconColorStyle = iconColor
+		? {
+				'--icon-color':
+					iconColor.startsWith('#') ||
+					iconColor.startsWith('rgb') ||
+					iconColor.startsWith('hsl')
+						? iconColor
+						: `var(--wp--preset--color--${iconColor})`,
+			}
+		: {};
+	const blockProps = useBlockProps({
+		style: iconColorStyle,
+		dateTime: startDate,
+	});
 
 	let preview = '';
 	if (startDate) {
@@ -186,7 +209,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 
 	return (
 		<>
-			<InspectorControls>
+			<InspectorControls group="settings">
 				<ToolsPanel
 					label={__('Settings', 'events')}
 					resetAll={resetAll}
@@ -279,9 +302,17 @@ export default function Edit({ attributes, context, setAttributes }) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<div {...blockProps}>
-				<time dateTime={startDate}>{content}</time>
-			</div>
+			<InspectorControls group="color">
+				<ColorControl
+					label={__('Icon', 'events')}
+					value={iconColor}
+					onChange={(value, slug) =>
+						setAttributes({ iconColor: slug ?? value ?? '' })
+					}
+					panelId={clientId}
+				/>
+			</InspectorControls>
+			<time {...blockProps}>{content}</time>
 		</>
 	);
 }

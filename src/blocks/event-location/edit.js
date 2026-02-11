@@ -12,11 +12,23 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit({ attributes, context, setAttributes }) {
-	const { prefix, suffix } = attributes;
+import ColorControl from '../../js/components/color-control';
+
+export default function Edit({ attributes, context, setAttributes, clientId }) {
+	const { prefix, suffix, iconColor } = attributes;
 	const postId = context?.postId;
 	const postType = context?.postType;
-	const blockProps = useBlockProps();
+	const iconColorStyle = iconColor
+		? {
+				'--icon-color':
+					iconColor.startsWith('#') ||
+					iconColor.startsWith('rgb') ||
+					iconColor.startsWith('hsl')
+						? iconColor
+						: `var(--wp--preset--color--${iconColor})`,
+			}
+		: {};
+	const blockProps = useBlockProps({ style: iconColorStyle });
 
 	const { location, isLoading } = useSelect(
 		(select) => {
@@ -122,6 +134,16 @@ export default function Edit({ attributes, context, setAttributes }) {
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="color">
+				<ColorControl
+					label={__('Icon', 'events')}
+					value={iconColor}
+					onChange={(value, slug) =>
+						setAttributes({ iconColor: slug ?? value ?? '' })
+					}
+					panelId={clientId}
+				/>
 			</InspectorControls>
 			<span {...blockProps}>{display}</span>
 		</>
