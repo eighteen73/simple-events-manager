@@ -271,7 +271,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 	if (isLoading) {
 		return (
 			<div {...blockProps}>
-				<span className="event-dates-placeholder">
+				<span className="event-all-dates-placeholder">
 					{__('Loading…', 'simple-events-manager')}
 				</span>
 			</div>
@@ -281,9 +281,9 @@ export default function Edit({ attributes, context, setAttributes }) {
 	if (occurrences.length === 0) {
 		return (
 			<div {...blockProps}>
-				<span className="event-dates-placeholder">
+				<span className="event-all-dates-placeholder">
 					{__(
-						'No upcoming dates for this event',
+						'No occurrence dates for this event',
 						'simple-events-manager'
 					)}
 				</span>
@@ -389,7 +389,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 			</InspectorControls>
 			<div {...blockProps}>
 				<ul
-					className="event-dates-list"
+					className="event-all-dates-list"
 					style={{ listStyle: 'none', paddingLeft: 0 }}
 				>
 					{capped.map((occ, i) => {
@@ -408,7 +408,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 								);
 						}
 						const content = isLink ? (
-							<a href="#event-dates-preview">{label}</a>
+							<a href="#event-all-dates-preview">{label}</a>
 						) : (
 							label
 						);

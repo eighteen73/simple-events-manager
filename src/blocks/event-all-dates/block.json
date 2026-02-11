@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "simple-events-manager/event-dates",
-	"title": "Event Dates",
+	"name": "simple-events-manager/event-all-dates",
+	"title": "All event dates",
 	"category": "widgets",
-	"description": "Lists upcoming occurrence dates for the current event.",
-	"textdomain": "events",
+	"description": "Lists all dates for the current event (e.g. recurring instances).",
+	"textdomain": "simple-events-manager",
 	"icon": "calendar-alt",
 	"attributes": {
 		"format": {
@@ -29,7 +29,10 @@
 			"default": false
 		}
 	},
-	"usesContext": ["postId", "postType"],
+	"usesContext": [
+		"postId",
+		"postType"
+	],
 	"supports": {
 		"html": false,
 		"color": true,

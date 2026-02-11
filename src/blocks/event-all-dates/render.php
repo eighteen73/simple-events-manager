@@ -1,6 +1,6 @@
 <?php
 /**
- * Event Dates block render — lists upcoming occurrence dates for the current event.
+ * Event All Dates block render — lists all dates for the current event.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block content.
