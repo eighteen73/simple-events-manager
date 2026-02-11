@@ -204,6 +204,74 @@ class Event {
 				'sanitize_callback' => 'sanitize_text_field',
 			],
 		);
+
+		$link_meta_schema = [
+			'type'       => 'object',
+			'properties' => [
+				'url'           => [
+					'type'   => 'string',
+					'format' => 'uri',
+				],
+				'opensInNewTab' => [
+					'type' => 'boolean',
+				],
+				'title'         => [
+					'type' => 'string',
+				],
+			],
+		];
+
+		register_post_meta(
+			$this->name,
+			"{$this->name}_details",
+			[
+				'show_in_rest'      => [
+					'schema' => $link_meta_schema,
+				],
+				'single'            => true,
+				'type'              => 'object',
+				'sanitize_callback' => [ $this, 'sanitize_link_meta' ],
+			],
+		);
+
+		register_post_meta(
+			$this->name,
+			"{$this->name}_booking",
+			[
+				'show_in_rest'      => [
+					'schema' => $link_meta_schema,
+				],
+				'single'            => true,
+				'type'              => 'object',
+				'sanitize_callback' => [ $this, 'sanitize_link_meta' ],
+			],
+		);
+	}
+
+	/**
+	 * Sanitize link meta (event_details / event_booking) object.
+	 *
+	 * @param mixed $value Meta value.
+	 * @return array{url?: string, opensInNewTab?: bool, title?: string}
+	 */
+	public function sanitize_link_meta( $value ): array {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+		$out = [];
+		if ( isset( $value['url'] ) && is_string( $value['url'] ) ) {
+			$out['url'] = esc_url_raw( $value['url'] );
+			if ( $out['url'] === '' ) {
+				unset( $out['url'] );
+			}
+		}
+		if ( isset( $value['opensInNewTab'] ) ) {
+			$out['opensInNewTab'] = (bool) $value['opensInNewTab'];
+		}
+		if ( isset( $value['title'] ) && is_string( $value['title'] ) ) {
+			$out['title'] = sanitize_text_field( $value['title'] );
+		}
+		return $out;
 	}
 
 	/**

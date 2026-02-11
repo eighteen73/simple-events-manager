@@ -39,17 +39,17 @@ class EventCategory {
 		$labels = apply_filters(
 			'simple_events_manager_event_category_labels',
 			[
-				'name'              => __( 'Categories', 'simple-events-manager' ),
-				'singular_name'     => __( 'Category', 'simple-events-manager' ),
-				'search_items'      => __( 'Search Categories', 'simple-events-manager' ),
-				'all_items'         => __( 'All Categories', 'simple-events-manager' ),
-				'parent_item'       => __( 'Parent Category', 'simple-events-manager' ),
-				'parent_item_colon' => __( 'Parent Category:', 'simple-events-manager' ),
-				'edit_item'         => __( 'Edit Category', 'simple-events-manager' ),
+				'name'              => __( 'Event Categories', 'simple-events-manager' ),
+				'singular_name'     => __( 'Event Category', 'simple-events-manager' ),
+				'search_items'      => __( 'Search Event Categories', 'simple-events-manager' ),
+				'all_items'         => __( 'All Event Categories', 'simple-events-manager' ),
+				'parent_item'       => __( 'Parent Event Category', 'simple-events-manager' ),
+				'parent_item_colon' => __( 'Parent Event Category:', 'simple-events-manager' ),
+				'edit_item'         => __( 'Edit Event Category', 'simple-events-manager' ),
 				'update_item'       => __( 'Update Category', 'simple-events-manager' ),
-				'add_new_item'      => __( 'Add New Category', 'simple-events-manager' ),
-				'new_item_name'     => __( 'New Category Name', 'simple-events-manager' ),
-				'menu_name'         => __( 'Categories', 'simple-events-manager' ),
+				'add_new_item'      => __( 'Add New Event Category', 'simple-events-manager' ),
+				'new_item_name'     => __( 'New Event Category Name', 'simple-events-manager' ),
+				'menu_name'         => __( 'Event Categories', 'simple-events-manager' ),
 			]
 		);
 
