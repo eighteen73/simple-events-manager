@@ -266,7 +266,7 @@ export default function Edit({ attributes, setAttributes }) {
 				)}
 
 				{!isLoadingEvents && events.length > 0 && (
-					<div className="event-calendar-editor-wrapper">
+					<div className="events-calendar-editor-wrapper">
 						<FullCalendar
 							ref={calendarRef}
 							plugins={[dayGridPlugin]}

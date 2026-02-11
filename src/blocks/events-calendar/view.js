@@ -1,7 +1,7 @@
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
-const calendarEl = document.getElementById('event-calendar');
+const calendarEl = document.getElementById('events-calendar');
 const events = JSON.parse(calendarEl.dataset.events);
 const calendar = new Calendar(calendarEl, {
 	plugins: [dayGridPlugin],

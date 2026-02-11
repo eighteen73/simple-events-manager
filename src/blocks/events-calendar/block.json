@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "simple-events-manager/event-calendar",
-	"title": "Event Calendar",
+	"name": "simple-events-manager/events-calendar",
+	"title": "Events Calendar",
 	"category": "widgets",
-	"description": "Displays events in a calendar.",
-	"textdomain": "event-calendar",
+	"description": "Displays events in a calendar view.",
+	"textdomain": "simple-events-manager",
 	"icon": "calendar",
 	"attributes": {
 		"eventCategory": {
@@ -15,7 +15,7 @@
 	},
 	"supports": {
 		"html": false,
-		"multiple": true,
+		"multiple": false,
 		"align": ["wide", "full"],
 		"spacing": {
 			"margin": true

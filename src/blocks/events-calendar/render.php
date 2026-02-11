@@ -89,5 +89,5 @@ if ( empty( $events ) ) {
 ?>
 
 <div <?php echo wp_kses_data( get_block_wrapper_attributes() ); ?>>
-	<div id="event-calendar" data-events="<?php echo esc_attr( wp_json_encode( $events ) ); ?>"></div>
+	<div id="events-calendar" data-events="<?php echo esc_attr( wp_json_encode( $events ) ); ?>"></div>
 </div>
