@@ -93,14 +93,14 @@ class EventOccurrences {
 		$has_start_time = is_string( $event_start_time_meta ) && $event_start_time_meta !== '';
 		$has_end_time   = is_string( $event_end_time_meta ) && $event_end_time_meta !== '';
 		if ( $has_start_time ) {
-			$event_start_date = date( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' ' . $event_start_time_meta ) );
+			$event_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' ' . $event_start_time_meta ) );
 		} else {
-			$event_start_date = date( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' midnight' ) );
+			$event_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date_meta . ' midnight' ) );
 		}
 		if ( $has_end_time ) {
-			$event_end_date = date( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' ' . $event_end_time_meta ) );
+			$event_end_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' ' . $event_end_time_meta ) );
 		} else {
-			$event_end_date = date( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' midnight + 1 day - 1 second' ) );
+			$event_end_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date_meta . ' midnight + 1 day - 1 second' ) );
 		}
 
 		$recurrence_type = get_post_meta( $post_id, $prefix . 'recurrence', true );
@@ -109,7 +109,7 @@ class EventOccurrences {
 		$recurrence_end_date_meta = get_post_meta( $post_id, $prefix . 'recurrence_end', true );
 		$recurrence_end_date      = null;
 		if ( is_string( $recurrence_end_date_meta ) && $recurrence_end_date_meta !== '' ) {
-			$recurrence_end_date = date( 'Y-m-d H:i:s', strtotime( $recurrence_end_date_meta . ' + 1 day midnight - 1 second' ) );
+			$recurrence_end_date = gmdate( 'Y-m-d H:i:s', strtotime( $recurrence_end_date_meta . ' + 1 day midnight - 1 second' ) );
 		}
 
 		$custom_dates = get_post_meta( $post_id, $post_type . '_custom_dates', true );
@@ -117,7 +117,7 @@ class EventOccurrences {
 			$custom_dates = [];
 		}
 
-		$today = date( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
+		$today = gmdate( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
 		$title = get_the_title( $post_id );
 		$url   = get_permalink( $post_id );
 
@@ -177,8 +177,8 @@ class EventOccurrences {
 				$recurrence_end_date = $recurrence_end_date ?? self::default_recurrence_end( $event_start_date, 'daily' );
 				$i                   = 0;
 				do {
-					$next_start_date = date( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . $i . ' days' ) );
-					$next_end_date   = date( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . $i . ' days' ) );
+					$next_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . $i . ' days' ) );
+					$next_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . $i . ' days' ) );
 					if (
 						strtotime( $next_end_date ) >= strtotime( $today )
 						&& strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
@@ -198,8 +198,8 @@ class EventOccurrences {
 				$recurrence_end_date = $recurrence_end_date ?? self::default_recurrence_end( $event_start_date, 'weekly' );
 				$i                   = 0;
 				do {
-					$next_start_date = date( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . ( 7 * $i ) . ' days' ) );
-					$next_end_date   = date( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . ( 7 * $i ) . ' days' ) );
+					$next_start_date = gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . ( 7 * $i ) . ' days' ) );
+					$next_end_date   = gmdate( 'Y-m-d H:i:s', strtotime( $event_end_date . ' + ' . ( 7 * $i ) . ' days' ) );
 					if (
 						strtotime( $next_end_date ) >= strtotime( $today )
 						&& strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
@@ -221,8 +221,8 @@ class EventOccurrences {
 				do {
 					$ts_start_raw    = strtotime( $event_start_date . ' + ' . $i . ' month' );
 					$ts_end_raw      = strtotime( $event_end_date . ' + ' . $i . ' month' );
-					$next_start_date = date( 'Y-m-d H:i:s', $ts_start_raw );
-					$next_end_date   = date( 'Y-m-d H:i:s', $ts_end_raw );
+					$next_start_date = gmdate( 'Y-m-d H:i:s', $ts_start_raw );
+					$next_end_date   = gmdate( 'Y-m-d H:i:s', $ts_end_raw );
 					if (
 						strtotime( $next_end_date ) >= strtotime( $today )
 						&& strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
@@ -244,8 +244,8 @@ class EventOccurrences {
 				do {
 					$ts_start_raw    = strtotime( $event_start_date . ' + ' . $i . ' year' );
 					$ts_end_raw      = strtotime( $event_end_date . ' + ' . $i . ' year' );
-					$next_start_date = date( 'Y-m-d H:i:s', $ts_start_raw );
-					$next_end_date   = date( 'Y-m-d H:i:s', $ts_end_raw );
+					$next_start_date = gmdate( 'Y-m-d H:i:s', $ts_start_raw );
+					$next_end_date   = gmdate( 'Y-m-d H:i:s', $ts_end_raw );
 					if (
 						strtotime( $next_end_date ) >= strtotime( $today )
 						&& strtotime( $next_start_date ) <= strtotime( $recurrence_end_date )
@@ -287,11 +287,11 @@ class EventOccurrences {
 						: null;
 
 					$start = $start_time !== null
-						? date( 'Y-m-d H:i:s', strtotime( $start_date . ' ' . $start_time ) )
-						: date( 'Y-m-d H:i:s', strtotime( $start_date . ' midnight' ) );
+						? gmdate( 'Y-m-d H:i:s', strtotime( $start_date . ' ' . $start_time ) )
+						: gmdate( 'Y-m-d H:i:s', strtotime( $start_date . ' midnight' ) );
 					$end   = $end_time !== null
-						? date( 'Y-m-d H:i:s', strtotime( $end_date . ' ' . $end_time ) )
-						: date( 'Y-m-d H:i:s', strtotime( $end_date . ' 23:59:59' ) );
+						? gmdate( 'Y-m-d H:i:s', strtotime( $end_date . ' ' . $end_time ) )
+						: gmdate( 'Y-m-d H:i:s', strtotime( $end_date . ' 23:59:59' ) );
 
 					if ( strtotime( $end ) >= strtotime( $today ) ) {
 						$events[] = [
@@ -331,8 +331,8 @@ class EventOccurrences {
 	 */
 	private static function default_recurrence_end( string $event_start_date, string $recurrence_type ): string {
 		if ( $recurrence_type === 'daily' ) {
-			return date( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . self::DEFAULT_RECURRENCE_DAYS_FOR_DAILY . ' days' ) );
+			return gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . self::DEFAULT_RECURRENCE_DAYS_FOR_DAILY . ' days' ) );
 		}
-		return date( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . self::DEFAULT_RECURRENCE_YEARS . ' year' ) );
+		return gmdate( 'Y-m-d H:i:s', strtotime( $event_start_date . ' + ' . self::DEFAULT_RECURRENCE_YEARS . ' year' ) );
 	}
 }

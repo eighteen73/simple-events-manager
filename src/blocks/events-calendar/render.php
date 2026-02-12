@@ -52,7 +52,7 @@ if ( ! $events_query->have_posts() ) {
 	return;
 }
 
-$today  = date( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
+$today  = gmdate( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
 $events = [];
 
 while ( $events_query->have_posts() ) {
@@ -68,8 +68,8 @@ while ( $events_query->have_posts() ) {
 		$end_ymd = $start_ymd;
 	}
 
-	$start_dt = date( 'Y-m-d H:i:s', strtotime( $start_ymd . ' midnight' ) );
-	$end_dt   = date( 'Y-m-d H:i:s', strtotime( $end_ymd . ' midnight + 1 day - 1 second' ) );
+	$start_dt = gmdate( 'Y-m-d H:i:s', strtotime( $start_ymd . ' midnight' ) );
+	$end_dt   = gmdate( 'Y-m-d H:i:s', strtotime( $end_ymd . ' midnight + 1 day - 1 second' ) );
 
 	if ( $end_dt < $today ) {
 		continue;
