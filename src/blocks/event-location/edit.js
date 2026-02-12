@@ -57,8 +57,9 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 				(suffix ? ' ' + suffix : '')
 			: '';
 
+	let content;
 	if (!postId || postType !== 'event') {
-		return (
+		content = (
 			<div {...blockProps}>
 				<em>
 					{__(
@@ -68,33 +69,31 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 				</em>
 			</div>
 		);
-	}
-
-	if (isLoading) {
-		return (
+	} else if (isLoading) {
+		content = (
 			<div {...blockProps}>
 				<span className="event-location-placeholder">
 					{__('Loading…', 'simple-events-manager')}
 				</span>
 			</div>
 		);
-	}
-
-	if (!display) {
-		return (
+	} else if (!display) {
+		content = (
 			<div {...blockProps}>
 				<span className="event-location-placeholder">
-					{__('No event location set', 'simple-events-manager')}
+					{__('No location set', 'simple-events-manager')}
 				</span>
 			</div>
 		);
+	} else {
+		content = <span {...blockProps}>{display}</span>;
 	}
 
 	const resetAll = () => setAttributes({ prefix: '', suffix: '' });
 
 	return (
 		<>
-			<InspectorControls>
+			<InspectorControls group="settings">
 				<ToolsPanel
 					label={__('Settings', 'simple-events-manager')}
 					resetAll={resetAll}
@@ -145,7 +144,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					panelId={clientId}
 				/>
 			</InspectorControls>
-			<span {...blockProps}>{display}</span>
+			{content}
 		</>
 	);
 }
