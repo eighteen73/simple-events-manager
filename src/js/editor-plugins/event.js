@@ -38,24 +38,34 @@ const EventDetailsPanel = () => {
 		setMeta({ ...meta, [field]: value });
 	};
 
+	const DEFAULT_RECURRENCE_DAYS_DAILY = 30;
+
 	const nextEventDates = (() => {
 		if (!meta?.event_start_date || meta.event_recurrence === 'single') {
 			return [];
 		}
 
 		const startDate = new Date(meta.event_start_date);
-		const endDate = meta.event_recurrence_end
+		let endDate = meta.event_recurrence_end
 			? new Date(meta.event_recurrence_end)
 			: null;
+		if (!endDate && meta.event_recurrence === 'daily') {
+			endDate = new Date(startDate);
+			endDate.setDate(endDate.getDate() + DEFAULT_RECURRENCE_DAYS_DAILY);
+		}
 		const dates = [];
 		const currentDate = new Date(startDate);
 
 		while (!endDate || currentDate <= endDate) {
 			dates.push(new Date(currentDate));
-			if (meta.event_recurrence === 'weekly') {
+			if (meta.event_recurrence === 'daily') {
+				currentDate.setDate(currentDate.getDate() + 1);
+			} else if (meta.event_recurrence === 'weekly') {
 				currentDate.setDate(currentDate.getDate() + 7);
 			} else if (meta.event_recurrence === 'monthly') {
 				currentDate.setMonth(currentDate.getMonth() + 1);
+			} else if (meta.event_recurrence === 'yearly') {
+				currentDate.setFullYear(currentDate.getFullYear() + 1);
 			} else {
 				break;
 			}
@@ -283,6 +293,13 @@ const EventDetailsPanel = () => {
 								value={meta.event_recurrence || 'single'}
 								options={[
 									{
+										value: 'daily',
+										label: __(
+											'Daily',
+											'simple-events-manager'
+										),
+									},
+									{
 										value: 'weekly',
 										label: __(
 											'Weekly',
@@ -293,6 +310,13 @@ const EventDetailsPanel = () => {
 										value: 'monthly',
 										label: __(
 											'Monthly',
+											'simple-events-manager'
+										),
+									},
+									{
+										value: 'yearly',
+										label: __(
+											'Yearly',
 											'simple-events-manager'
 										),
 									},
@@ -309,17 +333,26 @@ const EventDetailsPanel = () => {
 								}
 							/>
 
-							{(meta.event_recurrence === 'weekly' ||
-								meta.event_recurrence === 'monthly') && (
+							{(meta.event_recurrence === 'daily' ||
+								meta.event_recurrence === 'weekly' ||
+								meta.event_recurrence === 'monthly' ||
+								meta.event_recurrence === 'yearly') && (
 								<TextControl
 									label={__(
 										'Recurring events end on',
 										'simple-events-manager'
 									)}
-									help={__(
-										'Recurring events repeat for one year by default. Set an end date to limit the number of occurrences.',
-										'simple-events-manager'
-									)}
+									help={
+										meta.event_recurrence === 'daily'
+											? __(
+													'Daily events repeat for one month by default. Set an end date to extend or limit.',
+													'simple-events-manager'
+												)
+											: __(
+													'Recurring events repeat for one year by default. Set an end date to limit the number of occurrences.',
+													'simple-events-manager'
+												)
+									}
 									type="date"
 									value={meta.event_recurrence_end || ''}
 									onChange={(value) => {

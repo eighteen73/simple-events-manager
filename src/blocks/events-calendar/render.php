@@ -10,6 +10,8 @@
  * @package SimpleEventsManager
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $post_type      = 'event';
 $event_category = isset( $attributes['eventCategory'] ) ? $attributes['eventCategory'] : '';
 $prefix         = $post_type . '_';

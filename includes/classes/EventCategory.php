@@ -7,6 +7,8 @@
 
 namespace Eighteen73\SimpleEventsManager;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * "Event Category" registration class
  */

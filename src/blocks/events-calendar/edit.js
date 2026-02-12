@@ -20,9 +20,17 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
 const DEFAULT_RECURRENCE_YEARS = 1;
+const DEFAULT_RECURRENCE_DAYS_DAILY = 30;
 
 function normalizeRecurrenceType(type) {
-	const allowed = ['single', 'weekly', 'monthly', 'custom'];
+	const allowed = [
+		'single',
+		'daily',
+		'weekly',
+		'monthly',
+		'yearly',
+		'custom',
+	];
 	return typeof type === 'string' && allowed.includes(type) ? type : 'single';
 }
 
@@ -79,14 +87,25 @@ function expandEventToOccurrences(event) {
 		return occurrences;
 	}
 
-	if (recurrenceType === 'weekly' || recurrenceType === 'monthly') {
+	if (
+		recurrenceType === 'daily' ||
+		recurrenceType === 'weekly' ||
+		recurrenceType === 'monthly' ||
+		recurrenceType === 'yearly'
+	) {
 		const recurrenceEnd = recurrenceEndMeta
 			? toDate(recurrenceEndMeta)
 			: new Date(startDate);
 		if (!recurrenceEndMeta) {
-			recurrenceEnd.setFullYear(
-				recurrenceEnd.getFullYear() + DEFAULT_RECURRENCE_YEARS
-			);
+			if (recurrenceType === 'daily') {
+				recurrenceEnd.setDate(
+					recurrenceEnd.getDate() + DEFAULT_RECURRENCE_DAYS_DAILY
+				);
+			} else {
+				recurrenceEnd.setFullYear(
+					recurrenceEnd.getFullYear() + DEFAULT_RECURRENCE_YEARS
+				);
+			}
 		}
 		const currentStart = new Date(startDate);
 		const currentEnd = new Date(endDate);
@@ -98,12 +117,18 @@ function expandEventToOccurrences(event) {
 					end: formatISO(currentEnd),
 				});
 			}
-			if (recurrenceType === 'weekly') {
+			if (recurrenceType === 'daily') {
+				currentStart.setDate(currentStart.getDate() + 1);
+				currentEnd.setDate(currentEnd.getDate() + 1);
+			} else if (recurrenceType === 'weekly') {
 				currentStart.setDate(currentStart.getDate() + 7);
 				currentEnd.setDate(currentEnd.getDate() + 7);
-			} else {
+			} else if (recurrenceType === 'monthly') {
 				currentStart.setMonth(currentStart.getMonth() + 1);
 				currentEnd.setMonth(currentEnd.getMonth() + 1);
+			} else {
+				currentStart.setFullYear(currentStart.getFullYear() + 1);
+				currentEnd.setFullYear(currentEnd.getFullYear() + 1);
 			}
 		}
 		return occurrences;

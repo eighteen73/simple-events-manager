@@ -9,6 +9,8 @@
  * @package SimpleEventsManager
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $post_id = isset( $block->context['postId'] ) ? (int) $block->context['postId'] : 0;
 if ( ! $post_id || get_post_type( $post_id ) !== 'event' ) {
 	return '';
@@ -49,7 +51,8 @@ if ( $show_end_date && is_string( $end_date_meta ) && $end_date_meta !== '' && $
 	}
 }
 
-if ( $show_time && is_string( $start_time_meta ) && $start_time_meta !== '' ) {
+$is_full_day = ( is_string( $start_time_meta ) && $start_time_meta === '00:00' ) && ( is_string( $end_time_meta ) && $end_time_meta === '23:59' );
+if ( $show_time && is_string( $start_time_meta ) && $start_time_meta !== '' && ! $is_full_day ) {
 	$start_time_meta = sanitize_text_field( $start_time_meta );
 	$end_time_meta   = is_string( $end_time_meta ) ? sanitize_text_field( $end_time_meta ) : '';
 	if ( $show_end_time && $end_time_meta !== '' && $end_time_meta !== $start_time_meta ) {

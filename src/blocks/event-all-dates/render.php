@@ -11,6 +11,8 @@
 
 use Eighteen73\SimpleEventsManager\EventOccurrences;
 
+defined( 'ABSPATH' ) || exit;
+
 $post_id = isset( $block->context['postId'] ) ? (int) $block->context['postId'] : 0;
 if ( ! $post_id || get_post_type( $post_id ) !== 'event' ) {
 	return '';
