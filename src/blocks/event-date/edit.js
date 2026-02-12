@@ -159,8 +159,9 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 		}
 	}
 
+	let content;
 	if (!postId || postType !== 'event') {
-		return (
+		content = (
 			<div {...blockProps}>
 				<em>
 					{__(
@@ -170,33 +171,31 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 				</em>
 			</div>
 		);
-	}
-
-	if (isLoading) {
-		return (
+	} else if (isLoading) {
+		content = (
 			<div {...blockProps}>
 				<span className="event-date-placeholder">
 					{__('Loading…', 'simple-events-manager')}
 				</span>
 			</div>
 		);
-	}
-
-	if (!preview) {
-		return (
+	} else if (!preview) {
+		content = (
 			<div {...blockProps}>
 				<span className="event-date-placeholder">
 					{__('No event date set', 'simple-events-manager')}
 				</span>
 			</div>
 		);
+	} else {
+		content = isLink ? (
+			<a href="#event-date-preview">{preview}</a>
+		) : (
+			preview
+		);
+		content = <time {...blockProps}>{content}</time>;
 	}
 
-	const content = isLink ? (
-		<a href="#event-date-preview">{preview}</a>
-	) : (
-		preview
-	);
 	const resetAll = () =>
 		setAttributes({
 			format: 'j M Y',
@@ -315,7 +314,7 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 					panelId={clientId}
 				/>
 			</InspectorControls>
-			<time {...blockProps}>{content}</time>
+			{content}
 		</>
 	);
 }
