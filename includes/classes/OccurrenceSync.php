@@ -72,6 +72,11 @@ class OccurrenceSync {
 			return;
 		}
 
+		// Only sync when the event is published (or similar); skip drafts so occurrence children are not created until publish/update.
+		if ( $post->post_status === 'draft' ) {
+			return;
+		}
+
 		// Only run for top-level events (not for occurrence children).
 		if ( (int) $post->post_parent > 0 ) {
 			return;
@@ -392,76 +397,5 @@ class OccurrenceSync {
 		} else {
 			$query->set( 'meta_query', [ $occurrence_clause ] );
 		}
-	}
-
-	/**
-	 * Get post IDs of occurrence children whose parent is missing or trashed (orphans).
-	 *
-	 * @return int[]
-	 */
-	public function get_orphaned_occurrence_ids(): array {
-		$query         = new \WP_Query(
-			[
-				'post_type'      => 'event',
-				'post_status'    => 'any',
-				'fields'         => 'ids',
-				'posts_per_page' => -1,
-				'no_found_rows'  => true,
-				'meta_query'     => [
-					[
-						'key'   => self::OCCURRENCE_META_KEY,
-						'value' => '1',
-					],
-				],
-			]
-		);
-		$candidate_ids = $query->posts ?? [];
-		$orphans       = [];
-		foreach ( $candidate_ids as $id ) {
-			$post = get_post( (int) $id );
-			if ( ! $post || $post->post_type !== 'event' ) {
-				continue;
-			}
-			$parent_id = (int) $post->post_parent;
-			if ( $parent_id <= 0 ) {
-				$orphans[] = (int) $id;
-				continue;
-			}
-			$parent = get_post( $parent_id );
-			if ( ! $parent || $parent->post_type !== 'event' || $parent->post_status === 'trash' ) {
-				$orphans[] = (int) $id;
-			}
-		}
-		return $orphans;
-	}
-
-	/**
-	 * Permanently delete orphaned occurrence posts.
-	 *
-	 * @return int Number of posts deleted.
-	 */
-	public function delete_orphaned_occurrences(): int {
-		$ids    = $this->get_orphaned_occurrence_ids();
-		$count  = 0;
-		$self   = $this;
-		$remove = function () use ( $self ) {
-			remove_action( 'before_delete_post', [ $self, 'delete_children_before_parent' ], 10 );
-		};
-		$add    = function () use ( $self ) {
-			add_action( 'before_delete_post', [ $self, 'delete_children_before_parent' ], 10, 2 );
-		};
-		$remove();
-		try {
-			foreach ( $ids as $id ) {
-				$post = get_post( $id );
-				if ( $post && $post->post_type === 'event' ) {
-					wp_delete_post( $id, true );
-					++$count;
-				}
-			}
-		} finally {
-			$add();
-		}
-		return $count;
 	}
 }
