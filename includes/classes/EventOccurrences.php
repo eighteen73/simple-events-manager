@@ -35,9 +35,41 @@ class EventOccurrences {
 	public static function get_occurrences_for_post( int $post_id, string $post_type = 'event' ): array {
 		$prefix = $post_type . '_';
 
+		$recurrence_type = get_post_meta( $post_id, $prefix . 'recurrence', true );
+		$recurrence_type = self::normalize_recurrence_type( $recurrence_type );
+
+		$custom_dates = get_post_meta( $post_id, $post_type . '_custom_dates', true );
+		if ( ! is_array( $custom_dates ) ) {
+			$custom_dates = [];
+		}
+
 		$event_start_date_meta = get_post_meta( $post_id, $prefix . 'start_date', true );
 		if ( ! is_string( $event_start_date_meta ) || $event_start_date_meta === '' ) {
-			return [];
+			// For custom recurrence, allow proceeding when we have at least one valid additional date (meta may not be saved yet).
+			if ( $recurrence_type === 'custom' ) {
+				$first_valid = null;
+				$rest        = [];
+				foreach ( $custom_dates as $row ) {
+					if ( ! empty( $row['start_date'] ) && is_string( $row['start_date'] ) ) {
+						if ( $first_valid === null ) {
+							$first_valid = $row;
+						} else {
+							$rest[] = $row;
+						}
+					}
+				}
+				if ( $first_valid !== null ) {
+					$event_start_date_meta = $first_valid['start_date'];
+					$event_end_date_meta   = ! empty( $first_valid['end_date'] ) && is_string( $first_valid['end_date'] )
+						? $first_valid['end_date']
+						: $event_start_date_meta;
+					$custom_dates          = $rest;
+				} else {
+					return [];
+				}
+			} else {
+				return [];
+			}
 		}
 
 		$event_end_date_meta = get_post_meta( $post_id, $prefix . 'end_date', true );
@@ -164,6 +196,15 @@ class EventOccurrences {
 				break;
 
 			case 'custom':
+				// Primary event (main date & time) is the first occurrence; custom_dates are additional.
+				if ( strtotime( $event_end_date ) >= strtotime( $today ) ) {
+					$events[] = [
+						'title' => $title,
+						'url'   => $url,
+						'start' => $event_start_date,
+						'end'   => $event_end_date,
+					];
+				}
 				foreach ( $custom_dates as $custom_date ) {
 					if ( empty( $custom_date['start_date'] ) || ! is_string( $custom_date['start_date'] ) ) {
 						continue;
