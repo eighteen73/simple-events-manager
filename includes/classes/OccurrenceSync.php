@@ -38,6 +38,7 @@ class OccurrenceSync {
 		add_action( 'transition_post_status', [ $this, 'sync_children_status' ], 10, 3 );
 		add_action( 'pre_get_posts', [ $this, 'hide_occurrences_from_admin_list' ], 10, 1 );
 		add_action( 'load-post.php', [ $this, 'redirect_occurrence_edit_to_parent' ], 5, 0 );
+		add_filter( 'get_edit_post_link', [ $this, 'add_occurrence_redirect_nonce_to_edit_link' ], 10, 2 );
 		add_action( 'pre_get_posts', [ $this, 'front_end_show_occurrences_only' ], 10, 1 );
 		add_filter( 'query_loop_block_query_vars', [ $this, 'events_query_loop_order_by_start_date' ], 10, 1 );
 	}
@@ -354,7 +355,27 @@ class OccurrenceSync {
 	}
 
 	/**
+	 * Adds a nonce to the edit post link for occurrence posts so we can verify before redirecting.
+	 *
+	 * @param string $link    The edit link.
+	 * @param int    $post_id Post ID.
+	 * @return string Modified link.
+	 */
+	public function add_occurrence_redirect_nonce_to_edit_link( string $link, int $post_id ): string {
+		if ( get_post_meta( $post_id, self::OCCURRENCE_META_KEY, true ) !== '1' ) {
+			return $link;
+		}
+		return add_query_arg(
+			'_occurrence_redirect_nonce',
+			wp_create_nonce( 'occurrence_redirect_' . $post_id ),
+			$link
+		);
+	}
+
+	/**
 	 * Redirect editing an occurrence post to the parent event edit screen.
+	 *
+	 * Only redirects when the request includes a valid nonce and the user can edit the post.
 	 *
 	 * @return void
 	 */
@@ -363,6 +384,18 @@ class OccurrenceSync {
 		if ( $post_id <= 0 ) {
 			return;
 		}
+
+		$nonce = isset( $_GET['_occurrence_redirect_nonce'] ) && is_string( $_GET['_occurrence_redirect_nonce'] )
+			? sanitize_text_field( wp_unslash( $_GET['_occurrence_redirect_nonce'] ) )
+			: '';
+		if ( $nonce === '' || ! wp_verify_nonce( $nonce, 'occurrence_redirect_' . $post_id ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
 		$is_occurrence = get_post_meta( $post_id, self::OCCURRENCE_META_KEY, true );
 		if ( $is_occurrence !== '1' ) {
 			return;
