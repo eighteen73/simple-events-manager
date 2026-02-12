@@ -6,15 +6,19 @@ import {
 	SelectControl,
 	Button,
 	BaseControl,
+	Card,
+	CardBody,
+	CardHeader,
+	Modal,
 	__experimentalInputControl as InputControl, // eslint-disable-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack, // eslint-disable-line @wordpress/no-unsafe-wp-apis
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
-import { LinkControl } from '@humanmade/block-editor-components';
+import { __, sprintf } from '@wordpress/i18n';
 import { AbstractRepeater } from '../components/abstract-repeater';
+import LinkPicker from '../components/link-picker';
 
 const EventDetailsPanel = () => {
 	const postType = useSelect(
@@ -23,6 +27,7 @@ const EventDetailsPanel = () => {
 	);
 	const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
 	const [endDateError, setEndDateError] = useState(null);
+	const [isOccurrenceModalOpen, setIsOccurrenceModalOpen] = useState(false);
 	const showRecurrenceControls = meta.event_recurrence !== 'single';
 
 	if (postType !== 'event' || !meta) {
@@ -79,6 +84,80 @@ const EventDetailsPanel = () => {
 		return null;
 	};
 
+	// Normalize custom_dates items to { start_date, end_date, start_time, end_time } for display/save.
+	const customDates = (meta.event_custom_dates || []).map((item) => ({
+		start_date: item.start_date ?? '',
+		end_date: item.end_date ?? '',
+		start_time: item.start_time ?? '',
+		end_time: item.end_time ?? '',
+	}));
+
+	const formatOccurrenceLabel = (startDate, endDate, startTime, endTime) => {
+		const startStr = startDate.toLocaleDateString();
+		const endStr = endDate ? endDate.toLocaleDateString() : '';
+		const startTimeStr =
+			startTime && startTime.trim() !== ''
+				? `, ${startTime.slice(0, 5)}`
+				: '';
+		const endTimeStr =
+			endTime && endTime.trim() !== '' ? endTime.slice(0, 5) : '';
+		if (endStr && endStr !== startStr) {
+			return `${startStr}${startTimeStr} – ${endStr}${endTimeStr ? `, ${endTimeStr}` : ''}`;
+		}
+		if (endTimeStr) {
+			return `${startStr}${startTimeStr} – ${endTimeStr}`;
+		}
+		return `${startStr}${startTimeStr}`;
+	};
+
+	const occurrenceListForModal = (() => {
+		if (!showRecurrenceControls) {
+			return [];
+		}
+		if (meta.event_recurrence === 'custom') {
+			return (meta.event_custom_dates || [])
+				.map((item, index) => {
+					if (!item.start_date) {
+						return null;
+					}
+					const startDate = new Date(item.start_date);
+					const endDate = item.end_date
+						? new Date(item.end_date)
+						: startDate;
+					const label = formatOccurrenceLabel(
+						startDate,
+						endDate,
+						item.start_time,
+						item.end_time
+					);
+					return { key: index, label };
+				})
+				.filter(Boolean);
+		}
+		return nextEventDates.map((date, index) => {
+			const startDate = new Date(date);
+			let durationInDays = 1;
+			if (meta.event_start_date && meta.event_end_date) {
+				const originalStart = new Date(meta.event_start_date);
+				const originalEnd = new Date(meta.event_end_date);
+				if (!isNaN(originalStart) && !isNaN(originalEnd)) {
+					const msInDay = 1000 * 60 * 60 * 24;
+					durationInDays =
+						Math.ceil((originalEnd - originalStart) / msInDay) + 1;
+				}
+			}
+			const endDate = new Date(startDate);
+			endDate.setDate(startDate.getDate() + durationInDays - 1);
+			const label = formatOccurrenceLabel(
+				startDate,
+				endDate,
+				meta.event_start_time,
+				meta.event_end_time
+			);
+			return { key: index, label };
+		});
+	})();
+
 	return (
 		<>
 			<PluginDocumentSettingPanel
@@ -87,33 +166,17 @@ const EventDetailsPanel = () => {
 				className="event-details"
 			>
 				<VStack>
-					<LinkControl
+					<LinkPicker
+						id="event-details-link"
 						label={__('Details link', 'simple-events-manager')}
-						value={
-							meta.event_details?.url
-								? meta.event_details.url
-								: ''
-						}
-						onChange={(url) => {
-							updateMeta('event_details', {
-								...(meta.event_details || {}),
-								url: url || '',
-							});
-						}}
+						value={meta.event_details || ''}
+						onChange={(value) => updateMeta('event_details', value)}
 					/>
-					<LinkControl
+					<LinkPicker
+						id="event-booking-link"
 						label={__('Booking link', 'simple-events-manager')}
-						value={
-							meta.event_booking?.url
-								? meta.event_booking.url
-								: ''
-						}
-						onChange={(url) => {
-							updateMeta('event_booking', {
-								...(meta.event_booking || {}),
-								url: url || '',
-							});
-						}}
+						value={meta.event_booking || ''}
+						onChange={(value) => updateMeta('event_booking', value)}
 					/>
 
 					<TextControl
@@ -124,91 +187,6 @@ const EventDetailsPanel = () => {
 						}
 					/>
 
-					<BaseControl
-						label={__('Start Time', 'simple-events-manager')}
-						id="event-start-time"
-					>
-						<InputControl
-							type="time"
-							value={meta?.event_start_time || ''}
-							onChange={(value) =>
-								updateMeta(
-									'event_start_time',
-									value !== undefined && value !== null
-										? value
-										: ''
-								)
-							}
-						/>
-					</BaseControl>
-					<BaseControl
-						label={__('End Time', 'simple-events-manager')}
-						id="event-end-time"
-					>
-						<InputControl
-							type="time"
-							value={meta?.event_end_time || ''}
-							onChange={(value) =>
-								updateMeta(
-									'event_end_time',
-									value !== undefined && value !== null
-										? value
-										: ''
-								)
-							}
-						/>
-					</BaseControl>
-
-					{meta.event_recurrence !== 'custom' && (
-						<>
-							<TextControl
-								label={__(
-									'Start Date',
-									'simple-events-manager'
-								)}
-								type="date"
-								value={meta?.event_start_date || ''}
-								onChange={(value) =>
-									updateMeta('event_start_date', value)
-								}
-							/>
-
-							<TextControl
-								label={__('End Date', 'simple-events-manager')}
-								help={__(
-									'For single-day events, the end date does not need to be set (only for events spanning more than 1 day).',
-									'simple-events-manager'
-								)}
-								type="date"
-								value={meta?.event_end_date || ''}
-								onChange={(value) => {
-									const error = validateEndDate(
-										meta.event_start_date,
-										value
-									);
-									setEndDateError(error);
-									if (!error) {
-										updateMeta('event_end_date', value);
-									}
-								}}
-							/>
-
-							{endDateError && (
-								<p className="notice notice-error">
-									{endDateError}
-								</p>
-							)}
-						</>
-					)}
-				</VStack>
-			</PluginDocumentSettingPanel>
-
-			<PluginDocumentSettingPanel
-				name="recurring-events"
-				title={__('Recurring Events', 'simple-events-manager')}
-				className="recurring-events"
-			>
-				<VStack>
 					<ToggleControl
 						label={__(
 							'This is a recurring event',
@@ -257,76 +235,6 @@ const EventDetailsPanel = () => {
 								}}
 							/>
 
-							{meta.event_recurrence === 'custom' && (
-								<>
-									<AbstractRepeater
-										value={meta.event_custom_dates || []}
-										onChange={(newValue) =>
-											updateMeta(
-												'event_custom_dates',
-												newValue
-											)
-										}
-										allowReordering={true}
-										label={__(
-											'Custom dates',
-											'simple-events-manager'
-										)}
-									>
-										{(
-											item = {},
-											index,
-											setItem,
-											removeItem
-										) => (
-											<div key={index}>
-												<TextControl
-													label={__(
-														'Start Date',
-														'simple-events-manager'
-													)}
-													type="date"
-													value={item.start || ''}
-													onChange={(value) =>
-														setItem({
-															...item,
-															start: value || '',
-														})
-													}
-												/>
-												<TextControl
-													label={__(
-														'End Date',
-														'simple-events-manager'
-													)}
-													type="date"
-													value={item.end || ''}
-													onChange={(value) =>
-														setItem({
-															...item,
-															end: value || '',
-														})
-													}
-												/>
-												<Button
-													variant="secondary"
-													onClick={removeItem}
-												>
-													{__(
-														'Remove',
-														'simple-events-manager'
-													)}
-												</Button>
-											</div>
-										)}
-									</AbstractRepeater>
-								</>
-							)}
-						</>
-					)}
-
-					{meta.event_recurrence !== 'custom' && (
-						<>
 							{(meta.event_recurrence === 'weekly' ||
 								meta.event_recurrence === 'monthly') && (
 								<TextControl
@@ -351,86 +259,277 @@ const EventDetailsPanel = () => {
 						</>
 					)}
 
-					{showRecurrenceControls && (
-						<VStack spacing={2}>
-							{meta.event_recurrence !== 'custom' &&
-								nextEventDates.length > 0 &&
-								nextEventDates.map((date, index) => {
-									const startDate = new Date(date);
-									let durationInDays = 1;
-									if (
-										meta.event_start_date &&
-										meta.event_end_date
-									) {
-										const originalStart = new Date(
-											meta.event_start_date
-										);
-										const originalEnd = new Date(
-											meta.event_end_date
-										);
-										if (
-											!isNaN(originalStart) &&
-											!isNaN(originalEnd)
-										) {
-											const msInDay = 1000 * 60 * 60 * 24;
-											durationInDays =
-												Math.ceil(
-													(originalEnd -
-														originalStart) /
-														msInDay
-												) + 1;
-										}
+					{meta.event_recurrence !== 'custom' && (
+						<>
+							<TextControl
+								label={__(
+									'Start Date',
+									'simple-events-manager'
+								)}
+								type="date"
+								value={meta?.event_start_date || ''}
+								onChange={(value) =>
+									updateMeta('event_start_date', value)
+								}
+							/>
+							<TextControl
+								label={__('End Date', 'simple-events-manager')}
+								help={__(
+									'For single-day events, the end date does not need to be set (only for events spanning more than 1 day).',
+									'simple-events-manager'
+								)}
+								type="date"
+								value={meta?.event_end_date || ''}
+								onChange={(value) => {
+									const error = validateEndDate(
+										meta.event_start_date,
+										value
+									);
+									setEndDateError(error);
+									if (!error) {
+										updateMeta('event_end_date', value);
 									}
-									const endDate = new Date(startDate);
-									endDate.setDate(
-										startDate.getDate() + durationInDays - 1
-									);
-									return (
-										<p key={index}>
-											<strong>
-												{__(
-													'Recurring event',
+								}}
+							/>
+							{endDateError && (
+								<p className="notice notice-error">
+									{endDateError}
+								</p>
+							)}
+							<BaseControl
+								label={__(
+									'Start Time',
+									'simple-events-manager'
+								)}
+								id="event-start-time"
+							>
+								<InputControl
+									type="time"
+									value={meta?.event_start_time || ''}
+									onChange={(value) =>
+										updateMeta(
+											'event_start_time',
+											value !== undefined &&
+												value !== null
+												? value
+												: ''
+										)
+									}
+								/>
+							</BaseControl>
+							<BaseControl
+								label={__('End Time', 'simple-events-manager')}
+								id="event-end-time"
+							>
+								<InputControl
+									type="time"
+									value={meta?.event_end_time || ''}
+									onChange={(value) =>
+										updateMeta(
+											'event_end_time',
+											value !== undefined &&
+												value !== null
+												? value
+												: ''
+										)
+									}
+								/>
+							</BaseControl>
+						</>
+					)}
+					{showRecurrenceControls &&
+						meta.event_recurrence !== 'custom' && (
+							<Button
+								variant="tertiary"
+								onClick={() => setIsOccurrenceModalOpen(true)}
+								style={{ alignSelf: 'flex-start' }}
+							>
+								{__(
+									'View recurring events',
+									'simple-events-manager'
+								)}
+							</Button>
+						)}
+
+					{meta.event_recurrence === 'custom' && (
+						<>
+							<AbstractRepeater
+								value={customDates}
+								onChange={(newValue) =>
+									updateMeta(
+										'event_custom_dates',
+										newValue.map((item) => ({
+											start_date: item.start_date ?? '',
+											end_date: item.end_date ?? '',
+											start_time: item.start_time ?? '',
+											end_time: item.end_time ?? '',
+										}))
+									)
+								}
+								label={__(
+									'Custom dates',
+									'simple-events-manager'
+								)}
+							>
+								{(item = {}, index, setItem, removeItem) => (
+									<Card
+										key={index}
+										style={{ marginBottom: '12px' }}
+									>
+										<CardHeader>
+											{sprintf(
+												/* translators: %d: event number (1-based). */
+												__(
+													'Event %d',
 													'simple-events-manager'
-												)}{' '}
-												{index + 1}
-											</strong>
-											: {startDate.toLocaleDateString()} -{' '}
-											{endDate.toLocaleDateString()}
-										</p>
-									);
-								})}
-							{meta.event_recurrence === 'custom' &&
-								meta.event_custom_dates &&
-								meta.event_custom_dates.length > 0 &&
-								meta.event_custom_dates.map((item, index) => {
-									const startDate = new Date(item.start);
-									const endDate = item.end
-										? new Date(item.end)
-										: null;
-									const formattedStartDate =
-										startDate.toLocaleDateString();
-									const formattedEndDate = endDate
-										? endDate.toLocaleDateString()
-										: '';
-									return (
-										<p key={index}>
-											<strong>
-												{__(
-													'Recurring event',
-													'simple-events-manager'
-												)}{' '}
-												{index + 1}:
-											</strong>{' '}
-											{formattedStartDate}
-											{formattedEndDate &&
-												` - ${formattedEndDate}`}
-										</p>
-									);
-								})}
-						</VStack>
+												),
+												index + 1
+											)}
+										</CardHeader>
+										<CardBody>
+											<VStack spacing={2}>
+												<TextControl
+													label={__(
+														'Start date',
+														'simple-events-manager'
+													)}
+													type="date"
+													value={
+														item.start_date || ''
+													}
+													onChange={(value) =>
+														setItem({
+															...item,
+															start_date:
+																value || '',
+														})
+													}
+												/>
+												<TextControl
+													label={__(
+														'End date',
+														'simple-events-manager'
+													)}
+													type="date"
+													value={item.end_date || ''}
+													onChange={(value) =>
+														setItem({
+															...item,
+															end_date:
+																value || '',
+														})
+													}
+												/>
+												<BaseControl
+													label={__(
+														'Start time',
+														'simple-events-manager'
+													)}
+													id={`custom-start-time-${index}`}
+												>
+													<InputControl
+														type="time"
+														value={
+															item.start_time ||
+															''
+														}
+														onChange={(value) =>
+															setItem({
+																...item,
+																start_time:
+																	value !==
+																		undefined &&
+																	value !==
+																		null
+																		? value
+																		: '',
+															})
+														}
+													/>
+												</BaseControl>
+												<BaseControl
+													label={__(
+														'End time',
+														'simple-events-manager'
+													)}
+													id={`custom-end-time-${index}`}
+												>
+													<InputControl
+														type="time"
+														value={
+															item.end_time || ''
+														}
+														onChange={(value) =>
+															setItem({
+																...item,
+																end_time:
+																	value !==
+																		undefined &&
+																	value !==
+																		null
+																		? value
+																		: '',
+															})
+														}
+													/>
+												</BaseControl>
+												<Button
+													variant="secondary"
+													onClick={removeItem}
+													isDestructive
+													style={{
+														alignSelf: 'flex-start',
+													}}
+												>
+													{__(
+														'Remove date',
+														'simple-events-manager'
+													)}
+												</Button>
+											</VStack>
+										</CardBody>
+									</Card>
+								)}
+							</AbstractRepeater>
+							<Button
+								variant="secondary"
+								onClick={() => setIsOccurrenceModalOpen(true)}
+								style={{
+									justifyContent: 'center',
+									marginTop: '8px',
+								}}
+							>
+								{__(
+									'View recurring dates',
+									'simple-events-manager'
+								)}
+							</Button>
+						</>
 					)}
 				</VStack>
 			</PluginDocumentSettingPanel>
+
+			{isOccurrenceModalOpen && (
+				<Modal
+					title={__('Recurring dates', 'simple-events-manager')}
+					onRequestClose={() => setIsOccurrenceModalOpen(false)}
+				>
+					<ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+						{occurrenceListForModal.length === 0 ? (
+							<li>
+								{__(
+									'No recurring dates to show. Add start/end dates or custom date ranges and save.',
+									'simple-events-manager'
+								)}
+							</li>
+						) : (
+							occurrenceListForModal.map(({ key, label }) => (
+								<li key={key}>{label}</li>
+							))
+						)}
+					</ul>
+				</Modal>
+			)}
 		</>
 	);
 };

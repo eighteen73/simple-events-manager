@@ -100,6 +100,8 @@ class OccurrenceSync {
 			$needed[ $start_ymd ] = [
 				'start_date' => $start_ymd,
 				'end_date'   => $end_ymd,
+				'start_time' => gmdate( 'H:i', strtotime( $occ['start'] ) ),
+				'end_time'   => gmdate( 'H:i', strtotime( $occ['end'] ) ),
 			];
 		}
 
@@ -132,8 +134,8 @@ class OccurrenceSync {
 			$meta = [
 				'event_start_date'        => $dates['start_date'],
 				'event_end_date'          => $dates['end_date'],
-				'event_start_time'        => $parent_data['event_start_time'],
-				'event_end_time'          => $parent_data['event_end_time'],
+				'event_start_time'        => $dates['start_time'] ?? $parent_data['event_start_time'],
+				'event_end_time'          => $dates['end_time'] ?? $parent_data['event_end_time'],
 				'event_location'          => $parent_data['event_location'],
 				'event_recurrence'        => 'single',
 				self::OCCURRENCE_META_KEY => '1',

@@ -35,9 +35,9 @@
 		"postcss-preset-env": "latest"
 	},
 	"dependencies": {
+		"@wordpress/icons": "latest",
 		"@fullcalendar/core": "^6.1.15",
 		"@fullcalendar/daygrid": "^6.1.15",
-		"@fullcalendar/react": "^6.1.15",
-		"@humanmade/block-editor-components": "^0.10.0"
+		"@fullcalendar/react": "^6.1.15"
 	}
 }

@@ -1,7 +1,7 @@
-import { Button } from '@wordpress/components';
+import { Button, BaseControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export function AbstractRepeater({ value = [], onChange, children }) {
+export function AbstractRepeater({ value = [], onChange, children, label }) {
 	const addItem = () => onChange([...value, {}]);
 	const setItem = (index) => (newItem) => {
 		const newValue = [...value];
@@ -14,15 +14,19 @@ export function AbstractRepeater({ value = [], onChange, children }) {
 	};
 
 	return (
-		<div className="abstract-repeater">
+		<BaseControl
+			id="abstract-repeater"
+			label={label}
+			__nextHasNoMarginBottom
+		>
 			{value.map((item, index) => (
-				<div key={index} className="repeater-item">
+				<div key={index} style={{ marginBottom: 8 }}>
 					{children(item, index, setItem(index), removeItem(index))}
 				</div>
 			))}
-			<Button onClick={addItem} isSecondary>
-				{__('Add Custom start and end date', 'pulsar')}
+			<Button variant="secondary" onClick={addItem}>
+				{__('Add date', 'simple-events-manager')}
 			</Button>
-		</div>
+		</BaseControl>
 	);
 }

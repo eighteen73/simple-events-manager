@@ -100,7 +100,7 @@ class EventOccurrences {
 	 * @param string      $event_start_date   Start datetime (Y-m-d H:i:s).
 	 * @param string      $event_end_date     End datetime (Y-m-d H:i:s).
 	 * @param string|null $recurrence_end_date Recurrence end (weekly/monthly); null if not set.
-	 * @param array       $custom_dates       List of { start, end } for custom recurrence.
+	 * @param array       $custom_dates       List of { start_date, end_date, start_time?, end_time? } for custom recurrence.
 	 * @param string      $today              Today midnight (Y-m-d H:i:s) for filtering.
 	 * @param string      $title              Event title.
 	 * @param string      $url                Event permalink.
@@ -165,13 +165,27 @@ class EventOccurrences {
 
 			case 'custom':
 				foreach ( $custom_dates as $custom_date ) {
-					if ( empty( $custom_date['start'] ) || ! is_string( $custom_date['start'] ) ) {
+					if ( empty( $custom_date['start_date'] ) || ! is_string( $custom_date['start_date'] ) ) {
 						continue;
 					}
-					$start = date( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . ' midnight' ) );
-					$end   = ! empty( $custom_date['end'] ) && is_string( $custom_date['end'] )
-						? date( 'Y-m-d H:i:s', strtotime( $custom_date['end'] . ' 23:59:59' ) )
-						: date( 'Y-m-d H:i:s', strtotime( $custom_date['start'] . ' 23:59:59' ) );
+					$start_date = $custom_date['start_date'];
+					$end_date   = ! empty( $custom_date['end_date'] ) && is_string( $custom_date['end_date'] )
+						? $custom_date['end_date']
+						: $start_date;
+					$start_time = ! empty( $custom_date['start_time'] ) && is_string( $custom_date['start_time'] )
+						? $custom_date['start_time']
+						: null;
+					$end_time   = ! empty( $custom_date['end_time'] ) && is_string( $custom_date['end_time'] )
+						? $custom_date['end_time']
+						: null;
+
+					$start = $start_time !== null
+						? date( 'Y-m-d H:i:s', strtotime( $start_date . ' ' . $start_time ) )
+						: date( 'Y-m-d H:i:s', strtotime( $start_date . ' midnight' ) );
+					$end   = $end_time !== null
+						? date( 'Y-m-d H:i:s', strtotime( $end_date . ' ' . $end_time ) )
+						: date( 'Y-m-d H:i:s', strtotime( $end_date . ' 23:59:59' ) );
+
 					if ( strtotime( $end ) >= strtotime( $today ) ) {
 						$events[] = [
 							'title' => $title,

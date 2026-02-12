@@ -179,10 +179,16 @@ class Event {
 						'items' => [
 							'type'       => 'object',
 							'properties' => [
-								'start' => [
+								'start_date' => [
 									'type' => 'string',
 								],
-								'end'   => [
+								'end_date'   => [
+									'type' => 'string',
+								],
+								'start_time' => [
+									'type' => 'string',
+								],
+								'end_time'   => [
 									'type' => 'string',
 								],
 							],
@@ -205,32 +211,14 @@ class Event {
 			],
 		);
 
-		$link_meta_schema = [
-			'type'       => 'object',
-			'properties' => [
-				'url'           => [
-					'type'   => 'string',
-					'format' => 'uri',
-				],
-				'opensInNewTab' => [
-					'type' => 'boolean',
-				],
-				'title'         => [
-					'type' => 'string',
-				],
-			],
-		];
-
 		register_post_meta(
 			$this->name,
 			"{$this->name}_details",
 			[
-				'show_in_rest'      => [
-					'schema' => $link_meta_schema,
-				],
+				'show_in_rest'      => true,
 				'single'            => true,
-				'type'              => 'object',
-				'sanitize_callback' => [ $this, 'sanitize_link_meta' ],
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
 			],
 		);
 
@@ -238,40 +226,12 @@ class Event {
 			$this->name,
 			"{$this->name}_booking",
 			[
-				'show_in_rest'      => [
-					'schema' => $link_meta_schema,
-				],
+				'show_in_rest'      => true,
 				'single'            => true,
-				'type'              => 'object',
-				'sanitize_callback' => [ $this, 'sanitize_link_meta' ],
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
 			],
 		);
-	}
-
-	/**
-	 * Sanitize link meta (event_details / event_booking) object.
-	 *
-	 * @param mixed $value Meta value.
-	 * @return array{url?: string, opensInNewTab?: bool, title?: string}
-	 */
-	public function sanitize_link_meta( $value ): array {
-		if ( ! is_array( $value ) ) {
-			return [];
-		}
-		$out = [];
-		if ( isset( $value['url'] ) && is_string( $value['url'] ) ) {
-			$out['url'] = esc_url_raw( $value['url'] );
-			if ( $out['url'] === '' ) {
-				unset( $out['url'] );
-			}
-		}
-		if ( isset( $value['opensInNewTab'] ) ) {
-			$out['opensInNewTab'] = (bool) $value['opensInNewTab'];
-		}
-		if ( isset( $value['title'] ) && is_string( $value['title'] ) ) {
-			$out['title'] = sanitize_text_field( $value['title'] );
-		}
-		return $out;
 	}
 
 	/**
