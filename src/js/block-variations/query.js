@@ -19,8 +19,9 @@ registerBlockVariation('core/query', {
 		namespace === SIMPLE_EVENTS_MANAGER_QUERY_NAMESPACE,
 	attributes: {
 		namespace: SIMPLE_EVENTS_MANAGER_QUERY_NAMESPACE,
+		align: 'wide',
 		query: {
-			perPage: 10,
+			perPage: 20,
 			pages: 0,
 			offset: 0,
 			postType: 'event',
@@ -36,8 +37,69 @@ registerBlockVariation('core/query', {
 	innerBlocks: [
 		[
 			'core/post-template',
-			{},
-			[['core/post-title'], ['simple-events-manager/event-date']],
+			{
+				layout: {
+					type: 'grid',
+					columnCount: 3,
+				},
+			},
+			[
+				[
+					'core/group',
+					{
+						layout: { type: 'default' },
+					},
+					[
+						['core/post-featured-image', { aspectRatio: '4/3' }],
+						[
+							'core/group',
+							{
+								style: {
+									spacing: {
+										blockGap: 'var:preset|spacing|sm',
+									},
+								},
+								layout: {
+									type: 'flex',
+									orientation: 'vertical',
+								},
+							},
+							[
+								[
+									'core/group',
+									{
+										layout: {
+											type: 'flex',
+											flexWrap: 'wrap',
+										},
+									},
+									[
+										[
+											'simple-events-manager/event-date',
+											{
+												showTime: false,
+												showEndTime: false,
+											},
+										],
+										[
+											'simple-events-manager/event-location',
+											{},
+										],
+									],
+								],
+								['core/post-title', { level: 2 }],
+							],
+						],
+						[
+							'core/post-excerpt',
+							{
+								showMoreOnNewLine: false,
+								excerptLength: 20,
+							},
+						],
+					],
+				],
+			],
 		],
 		['core/query-pagination'],
 		['core/query-no-results'],
