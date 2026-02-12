@@ -90,6 +90,10 @@ if ( empty( $events ) ) {
 }
 ?>
 
-<div <?php echo wp_kses_data( get_block_wrapper_attributes() ); ?>>
-	<div id="events-calendar" data-events="<?php echo esc_attr( wp_json_encode( $events ) ); ?>"></div>
+<?php
+$wrapper_attrs = get_block_wrapper_attributes();
+$events_json   = wp_json_encode( $events );
+?>
+<div <?php echo wp_kses_data( $wrapper_attrs ); ?>>
+	<div id="events-calendar" data-events="<?php echo esc_attr( $events_json ); ?>"></div>
 </div>

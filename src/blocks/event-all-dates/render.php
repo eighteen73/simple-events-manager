@@ -44,7 +44,10 @@ if ( $max_items > 0 ) {
 	$occurrences = array_slice( $occurrences, 0, $max_items );
 }
 
-$items = [];
+$wrapper_attributes = get_block_wrapper_attributes();
+?>
+<ul <?php echo wp_kses_data( $wrapper_attributes ); ?>>
+<?php
 foreach ( $occurrences as $occ ) {
 	$start_ts  = strtotime( $occ['start'] );
 	$end_ts    = strtotime( $occ['end'] );
@@ -53,14 +56,20 @@ foreach ( $occurrences as $occ ) {
 	if ( $show_end && gmdate( 'Y-m-d', $end_ts ) !== $start_ymd ) {
 		$formatted .= ' - ' . wp_date( $format, $end_ts, $timezone );
 	}
+	?>
+	<li>
+	<?php
 	if ( $is_link ) {
-		$url       = add_query_arg( 'date', $start_ymd, $permalink );
-		$formatted = '<a href="' . esc_url( $url ) . '">' . esc_html( $formatted ) . '</a>';
+		$url = add_query_arg( 'date', $start_ymd, $permalink );
+		?>
+		<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $formatted ); ?></a>
+		<?php
 	} else {
-		$formatted = esc_html( $formatted );
+		echo esc_html( $formatted );
 	}
-	$items[] = '<li>' . $formatted . '</li>';
+	?>
+	</li>
+	<?php
 }
-
-$wrapper_attributes = get_block_wrapper_attributes();
-echo '<ul ' . wp_kses_data( $wrapper_attributes ) . '>' . implode( '', $items ) . '</ul>';
+?>
+</ul>

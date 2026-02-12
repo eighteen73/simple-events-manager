@@ -67,13 +67,7 @@ if ( is_string( $start_time_meta ) && $start_time_meta !== '' ) {
 	$datetime .= 'T' . $start_time_meta;
 }
 
-$inner = esc_html( $output );
-if ( $is_link ) {
-	$url   = get_permalink( $post_id );
-	$inner = '<a href="' . esc_url( $url ) . '">' . $inner . '</a>';
-}
-
-$wrapper_args = [ 'datetime' => $datetime ];
+$wrapper_args = [ 'datetime' => esc_attr( $datetime ) ];
 $icon_color   = isset( $attributes['iconColor'] ) && is_string( $attributes['iconColor'] ) ? $attributes['iconColor'] : '';
 if ( $icon_color !== '' ) {
 	$slug = sanitize_key( $icon_color );
@@ -84,4 +78,14 @@ if ( $icon_color !== '' ) {
 	}
 }
 $wrapper_attributes = get_block_wrapper_attributes( $wrapper_args, 'time' );
-echo '<time ' . wp_kses_data( $wrapper_attributes ) . '>' . $inner . '</time>';
+
+if ( $is_link ) {
+	$url = get_permalink( $post_id );
+	?>
+	<time <?php echo wp_kses_data( $wrapper_attributes ); ?>><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $output ); ?></a></time>
+	<?php
+} else {
+	?>
+	<time <?php echo wp_kses_data( $wrapper_attributes ); ?>><?php echo esc_html( $output ); ?></time>
+	<?php
+}

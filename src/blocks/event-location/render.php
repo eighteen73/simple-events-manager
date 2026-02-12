@@ -24,15 +24,8 @@ if ( ! is_string( $location ) || $location === '' ) {
 $prefix = isset( $attributes['prefix'] ) && is_string( $attributes['prefix'] ) ? $attributes['prefix'] : '';
 $suffix = isset( $attributes['suffix'] ) && is_string( $attributes['suffix'] ) ? $attributes['suffix'] : '';
 
-$parts = [];
-if ( $prefix !== '' ) {
-	$parts[] = esc_html( $prefix );
-}
-$parts[] = esc_html( $location );
-if ( $suffix !== '' ) {
-	$parts[] = esc_html( $suffix );
-}
-$inner = implode( ' ', $parts );
+$parts      = array_filter( [ $prefix, $location, $suffix ] );
+$inner_text = implode( ' ', $parts );
 
 $wrapper_args = [];
 $icon_color   = isset( $attributes['iconColor'] ) && is_string( $attributes['iconColor'] ) ? $attributes['iconColor'] : '';
@@ -45,4 +38,5 @@ if ( $icon_color !== '' ) {
 	}
 }
 $wrapper_attributes = get_block_wrapper_attributes( $wrapper_args );
-echo '<span ' . wp_kses_data( $wrapper_attributes ) . '>' . $inner . '</span>';
+?>
+<span <?php echo wp_kses_data( $wrapper_attributes ); ?>><?php echo esc_html( $inner_text ); ?></span>
