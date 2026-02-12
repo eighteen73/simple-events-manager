@@ -4,7 +4,7 @@
  * Description:       Add and display events on your WordPress site.
  * Requires at least: 6.5
  * Requires PHP:      7.4
- * Version:           0.1.0
+ * Version:           0.1.1
  * Author:            eighteen73 Web Team
  * Author URI:        https://eighteen73.co.uk
  * License:           GPL-2.0-or-later
