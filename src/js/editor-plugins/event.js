@@ -39,6 +39,7 @@ const EventDetailsPanel = () => {
 	};
 
 	const DEFAULT_RECURRENCE_DAYS_DAILY = 30;
+	const DEFAULT_RECURRENCE_YEARS = 1;
 
 	const nextEventDates = (() => {
 		if (!meta?.event_start_date || meta.event_recurrence === 'single') {
@@ -49,14 +50,26 @@ const EventDetailsPanel = () => {
 		let endDate = meta.event_recurrence_end
 			? new Date(meta.event_recurrence_end)
 			: null;
-		if (!endDate && meta.event_recurrence === 'daily') {
+		if (!endDate) {
 			endDate = new Date(startDate);
-			endDate.setDate(endDate.getDate() + DEFAULT_RECURRENCE_DAYS_DAILY);
+			if (meta.event_recurrence === 'daily') {
+				endDate.setDate(
+					endDate.getDate() + DEFAULT_RECURRENCE_DAYS_DAILY
+				);
+			} else if (
+				meta.event_recurrence === 'weekly' ||
+				meta.event_recurrence === 'monthly' ||
+				meta.event_recurrence === 'yearly'
+			) {
+				endDate.setFullYear(
+					endDate.getFullYear() + DEFAULT_RECURRENCE_YEARS
+				);
+			}
 		}
 		const dates = [];
 		const currentDate = new Date(startDate);
 
-		while (!endDate || currentDate <= endDate) {
+		while (currentDate <= endDate) {
 			dates.push(new Date(currentDate));
 			if (meta.event_recurrence === 'daily') {
 				currentDate.setDate(currentDate.getDate() + 1);
@@ -67,9 +80,6 @@ const EventDetailsPanel = () => {
 			} else if (meta.event_recurrence === 'yearly') {
 				currentDate.setFullYear(currentDate.getFullYear() + 1);
 			} else {
-				break;
-			}
-			if (!endDate && dates.length >= 10) {
 				break;
 			}
 		}
