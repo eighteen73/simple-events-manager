@@ -28,11 +28,12 @@ const EventDetailsPanel = () => {
 	const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
 	const [endDateError, setEndDateError] = useState(null);
 	const [isOccurrenceModalOpen, setIsOccurrenceModalOpen] = useState(false);
-	const showRecurrenceControls = meta.event_recurrence !== 'single';
 
-	if (postType !== 'event' || !meta) {
+	if (postType !== 'event' || meta === undefined) {
 		return null;
 	}
+
+	const showRecurrenceControls = meta.event_recurrence !== 'single';
 
 	const updateMeta = (field, value) => {
 		setMeta({ ...meta, [field]: value });
