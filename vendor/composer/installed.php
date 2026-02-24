@@ -3,7 +3,7 @@
         'name' => 'eighteen73/simple-events-manager',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'c9d9540465dab874c3909406c9a2577a34595f61',
+        'reference' => 'b4c23c9d9052927009fd80e3d9f19046e3cf0409',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'eighteen73/simple-events-manager' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'c9d9540465dab874c3909406c9a2577a34595f61',
+            'reference' => 'b4c23c9d9052927009fd80e3d9f19046e3cf0409',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
