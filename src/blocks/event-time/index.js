@@ -1,0 +1,16 @@
+/**
+ * Event Time block registration.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
+ */
+import { registerBlockType } from '@wordpress/blocks';
+import json from './block.json';
+import Edit from './edit';
+
+import './style.scss';
+
+const { name } = json;
+
+registerBlockType(name, {
+	edit: Edit,
+});

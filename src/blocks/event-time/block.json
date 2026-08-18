@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "simple-events-manager/event-time",
+	"title": "Event Time",
+	"category": "widgets",
+	"description": "Displays the event start time, with optional end time.",
+	"textdomain": "events",
+	"icon": "clock",
+	"attributes": {
+		"showEndTime": { "type": "boolean", "default": true },
+		"isLink": { "type": "boolean", "default": false },
+		"iconColor": { "type": "string", "default": "" }
+	},
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"color": true,
+		"typography": {
+			"fontSize": true,
+			"fontFamily": true,
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"lineHeight": true,
+			"textDecoration": true,
+			"textTransform": true,
+			"textAlign": true
+		},
+		"spacing": true
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}
