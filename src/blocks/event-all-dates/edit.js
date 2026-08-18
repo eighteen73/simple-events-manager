@@ -13,6 +13,7 @@ import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { dateI18n } from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
 
 const DEFAULT_RECURRENCE_YEARS = 1;
@@ -151,55 +152,7 @@ function formatPreviewDate(dateStr, format) {
 	if (isNaN(d.getTime())) {
 		return dateStr;
 	}
-	const pad = (n) => (n < 10 ? '0' + n : '' + n);
-	const months = [
-		'Jan',
-		'Feb',
-		'Mar',
-		'Apr',
-		'May',
-		'Jun',
-		'Jul',
-		'Aug',
-		'Sep',
-		'Oct',
-		'Nov',
-		'Dec',
-	];
-	const monthsFull = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December',
-	];
-	const days = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday',
-	];
-	// Replace numeric/single-char tokens first so we don't replace 'd' or 'n'
-	// inside weekday/month names (e.g. "Wednesday", "February").
-	return format
-		.replace('Y', d.getFullYear())
-		.replace('m', pad(d.getMonth() + 1))
-		.replace('n', String(d.getMonth() + 1))
-		.replace('j', String(d.getDate()))
-		.replace('d', pad(d.getDate()))
-		.replace('F', monthsFull[d.getMonth()])
-		.replace('M', months[d.getMonth()])
-		.replace('l', days[d.getDay()]);
+	return dateI18n(format, d);
 }
 
 function getFormatPresets() {
@@ -341,6 +294,7 @@ export default function Edit({ attributes, context, setAttributes }) {
 						isShownByDefault
 					>
 						<SelectControl
+							__next40pxDefaultSize
 							label={__('Format', 'simple-events-manager')}
 							value={format}
 							options={getFormatPresets()}

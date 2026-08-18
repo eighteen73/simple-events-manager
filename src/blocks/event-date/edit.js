@@ -11,7 +11,10 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalGrid as Grid,
 } from '@wordpress/components';
+import { dateI18n } from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
 
 import ColorControl from '../../js/components/color-control';
@@ -24,56 +27,7 @@ function formatPreviewDate(dateStr, format) {
 	if (isNaN(d.getTime())) {
 		return dateStr;
 	}
-	const pad = (n) => (n < 10 ? '0' + n : '' + n);
-	const months = [
-		'Jan',
-		'Feb',
-		'Mar',
-		'Apr',
-		'May',
-		'Jun',
-		'Jul',
-		'Aug',
-		'Sep',
-		'Oct',
-		'Nov',
-		'Dec',
-	];
-	const monthsFull = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December',
-	];
-	const days = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday',
-	];
-	// Replace numeric/single-char tokens first so we don't replace 'd' or 'n'
-	// inside weekday/month names (e.g. "Wednesday", "February").
-	const out = format
-		.replace('Y', d.getFullYear())
-		.replace('m', pad(d.getMonth() + 1))
-		.replace('n', String(d.getMonth() + 1))
-		.replace('j', String(d.getDate()))
-		.replace('d', pad(d.getDate()))
-		.replace('F', monthsFull[d.getMonth()])
-		.replace('M', months[d.getMonth()])
-		.replace('l', days[d.getDay()]);
-	return out;
+	return dateI18n(format, d);
 }
 
 function getFormatPresets() {
@@ -221,30 +175,35 @@ export default function Edit({ attributes, context, setAttributes, clientId }) {
 						}
 						isShownByDefault
 					>
-						<SelectControl
-							label={__('Format', 'simple-events-manager')}
-							value={format}
-							options={getFormatPresets()}
-							onChange={(value) =>
-								setAttributes({ format: value })
-							}
-						/>
-						{format === 'custom' && (
-							<TextControl
-								label={__(
-									'Custom format',
-									'simple-events-manager'
-								)}
-								help={__(
-									'PHP date format (e.g. j M Y)',
-									'simple-events-manager'
-								)}
-								value={customFormat}
+						<Grid columns={1} gap={4}>
+							<SelectControl
+								label={__('Format', 'simple-events-manager')}
+								value={format}
+								options={getFormatPresets()}
 								onChange={(value) =>
-									setAttributes({ customFormat: value ?? '' })
+									setAttributes({ format: value })
 								}
+								__next40pxDefaultSize
 							/>
-						)}
+							{format === 'custom' && (
+								<TextControl
+									label={__(
+										'Custom format',
+										'simple-events-manager'
+									)}
+									help={__(
+										'PHP date format (e.g. j M Y)',
+										'simple-events-manager'
+									)}
+									value={customFormat}
+									onChange={(value) =>
+										setAttributes({
+											customFormat: value ?? '',
+										})
+									}
+								/>
+							)}
+						</Grid>
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={() => !showEndDate}

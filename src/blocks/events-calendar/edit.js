@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	SelectControl,
 	Spinner,
@@ -16,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
  */
-import FullCalendar from '@fullcalendar/react';
+import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
 const DEFAULT_RECURRENCE_YEARS = 1;
@@ -177,10 +178,34 @@ function eventsToCalendarList(rawEvents) {
 	return result;
 }
 
+/**
+ * FullCalendar v6 injects CSS into el.getRootNode(). In the iframed block
+ * editor that root is the canvas Document, which is not `=== document`, so
+ * it tries to insert a <style> as a second Element child of Document.
+ * Pre-seed the expected tag in the iframe head so registerStylesRoot skips insertBefore.
+ *
+ * @param {HTMLElement} el Calendar host element.
+ */
+function ensureFullCalendarIframeStyles(el) {
+	const ownerDoc = el.ownerDocument;
+	const rootNode = el.getRootNode ? el.getRootNode() : ownerDoc;
+	if (!ownerDoc || rootNode === document) {
+		return;
+	}
+	if (
+		rootNode.querySelector &&
+		rootNode.querySelector('style[data-fullcalendar]')
+	) {
+		return;
+	}
+	const styleEl = ownerDoc.createElement('style');
+	styleEl.setAttribute('data-fullcalendar', '');
+	(ownerDoc.head || ownerDoc.documentElement).appendChild(styleEl);
+}
+
 export default function Edit({ attributes, setAttributes }) {
 	const { eventCategory } = attributes;
 	const blockProps = useBlockProps();
-	const calendarRef = useRef(null);
 	const [events, setEvents] = useState([]);
 	const [errorText, setErrorText] = useState(null);
 	const [categories, setCategories] = useState([]);
@@ -234,6 +259,36 @@ export default function Edit({ attributes, setAttributes }) {
 			});
 	}, [eventCategory]);
 
+	const calendarNodeRef = useRefEffect(
+		(el) => {
+			ensureFullCalendarIframeStyles(el);
+			const calendar = new Calendar(el, {
+				plugins: [dayGridPlugin],
+				initialView: 'dayGridMonth',
+				events,
+				displayEventTime: false,
+				firstDay: 0,
+				eventDisplay: 'block',
+				validRange(nowDate) {
+					return {
+						start: new Date(
+							nowDate.getFullYear(),
+							nowDate.getMonth(),
+							1
+						),
+					};
+				},
+				buttonIcons: false,
+				height: 'auto',
+			});
+			calendar.render();
+			return () => {
+				calendar.destroy();
+			};
+		},
+		[events]
+	);
+
 	if (errorText) {
 		return (
 			<div {...blockProps}>
@@ -277,6 +332,7 @@ export default function Edit({ attributes, setAttributes }) {
 										eventCategory: selectedCategory,
 									})
 								}
+								__next40pxDefaultSize
 							/>
 						)}
 					</ToolsPanelItem>
@@ -291,26 +347,10 @@ export default function Edit({ attributes, setAttributes }) {
 				)}
 
 				{!isLoadingEvents && events.length > 0 && (
-					<div className="events-calendar-editor-wrapper">
-						<FullCalendar
-							ref={calendarRef}
-							plugins={[dayGridPlugin]}
-							initialView="dayGridMonth"
-							events={events}
-							displayEventTime={false}
-							firstDay={0}
-							eventDisplay="block"
-							validRange={(nowDate) => ({
-								start: new Date(
-									nowDate.getFullYear(),
-									nowDate.getMonth(),
-									1
-								),
-							})}
-							buttonIcons={false}
-							height="auto"
-						/>
-					</div>
+					<div
+						className="events-calendar-editor-wrapper"
+						ref={calendarNodeRef}
+					/>
 				)}
 			</div>
 		</>
