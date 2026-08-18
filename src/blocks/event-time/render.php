@@ -23,18 +23,23 @@ if ( ! is_string( $start_time_meta ) || $start_time_meta === '' ) {
 	return '';
 }
 
-$is_full_day = $start_time_meta === '00:00' && is_string( $end_time_meta ) && $end_time_meta === '23:59';
+$start_time_meta = sanitize_text_field( $start_time_meta );
+$end_time_meta   = is_string( $end_time_meta ) ? sanitize_text_field( $end_time_meta ) : '';
+$start_hm        = substr( $start_time_meta, 0, 5 );
+$end_hm          = substr( $end_time_meta, 0, 5 );
+
+// 00:00–23:59 is the implicit all-day range; 23:59 alone is the default when no end time was entered.
+$is_full_day = $start_hm === '00:00' && $end_hm === '23:59';
 if ( $is_full_day ) {
 	return '';
 }
 
-$start_time_meta = sanitize_text_field( $start_time_meta );
-$end_time_meta   = is_string( $end_time_meta ) ? sanitize_text_field( $end_time_meta ) : '';
-$show_end_time   = ! isset( $attributes['showEndTime'] ) || $attributes['showEndTime'];
-$is_link         = ! empty( $attributes['isLink'] );
+$show_end_time = ! isset( $attributes['showEndTime'] ) || $attributes['showEndTime'];
+$is_link       = ! empty( $attributes['isLink'] );
+$has_end_time  = $end_hm !== '' && $end_hm !== '23:59' && $end_hm !== $start_hm;
 
 $output = $start_time_meta;
-if ( $show_end_time && $end_time_meta !== '' && $end_time_meta !== $start_time_meta ) {
+if ( $show_end_time && $has_end_time ) {
 	$output .= ' – ' . $end_time_meta;
 }
 

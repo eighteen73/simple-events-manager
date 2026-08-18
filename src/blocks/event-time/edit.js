@@ -15,7 +15,20 @@ import { __ } from '@wordpress/i18n';
 import ColorControl from '../../js/components/color-control';
 
 function isFullDay(startTime, endTime) {
-	return startTime === '00:00' && endTime === '23:59';
+	return (
+		toHourMinute(startTime) === '00:00' && toHourMinute(endTime) === '23:59'
+	);
+}
+
+function toHourMinute(time) {
+	return typeof time === 'string' ? time.slice(0, 5) : '';
+}
+
+function hasExplicitEndTime(startTime, endTime) {
+	const endHm = toHourMinute(endTime);
+	return (
+		endHm !== '' && endHm !== '23:59' && endHm !== toHourMinute(startTime)
+	);
 }
 
 function formatTimePreview(startTime, endTime, showEndTime) {
@@ -24,7 +37,7 @@ function formatTimePreview(startTime, endTime, showEndTime) {
 	}
 
 	let preview = startTime;
-	if (showEndTime && endTime && endTime !== startTime) {
+	if (showEndTime && hasExplicitEndTime(startTime, endTime)) {
 		preview += ' – ' + endTime;
 	}
 	return preview;

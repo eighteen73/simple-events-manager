@@ -125,11 +125,13 @@ class OccurrenceSync {
 		foreach ( $occurrences as $occ ) {
 			$start_ymd            = gmdate( 'Y-m-d', strtotime( $occ['start'] ) );
 			$end_ymd              = gmdate( 'Y-m-d', strtotime( $occ['end'] ) );
+			$end_hi               = gmdate( 'H:i', strtotime( $occ['end'] ) );
 			$needed[ $start_ymd ] = [
 				'start_date' => $start_ymd,
 				'end_date'   => $end_ymd,
 				'start_time' => gmdate( 'H:i', strtotime( $occ['start'] ) ),
-				'end_time'   => gmdate( 'H:i', strtotime( $occ['end'] ) ),
+				// 23:59 is the implicit end-of-day when no end time was entered.
+				'end_time'   => $end_hi === '23:59' ? '' : $end_hi,
 			];
 		}
 
