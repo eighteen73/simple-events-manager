@@ -155,6 +155,53 @@ return array(
 		'style' => 'file:./style-index.css',
 		'render' => 'file:./render.php'
 	),
+	'event-time' => array(
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'apiVersion' => 3,
+		'name' => 'simple-events-manager/event-time',
+		'title' => 'Event Time',
+		'category' => 'widgets',
+		'description' => 'Displays the event start time, with optional end time.',
+		'textdomain' => 'events',
+		'icon' => 'clock',
+		'attributes' => array(
+			'showEndTime' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'isLink' => array(
+				'type' => 'boolean',
+				'default' => false
+			),
+			'iconColor' => array(
+				'type' => 'string',
+				'default' => ''
+			)
+		),
+		'usesContext' => array(
+			'postId',
+			'postType'
+		),
+		'supports' => array(
+			'html' => false,
+			'color' => true,
+			'typography' => array(
+				'fontSize' => true,
+				'fontFamily' => true,
+				'fontStyle' => true,
+				'fontWeight' => true,
+				'letterSpacing' => true,
+				'lineHeight' => true,
+				'textDecoration' => true,
+				'textTransform' => true,
+				'textAlign' => true
+			),
+			'spacing' => true
+		),
+		'editorScript' => 'file:./index.js',
+		'style' => 'file:./style-index.css',
+		'render' => 'file:./render.php'
+	),
 	'events-calendar' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'apiVersion' => 3,
