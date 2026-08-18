@@ -582,6 +582,9 @@ class OccurrenceSync {
 		if ( $query->get( 'sem_calendar_parents' ) ) {
 			return;
 		}
+		if ( $query->is_singular() || $query->get( 'name' ) || $query->get( 'p' ) ) {
+			return;
+		}
 		$existing_meta     = $query->get( 'meta_query' );
 		$occurrence_clause = [
 			'key'   => 'event_recurrence',
