@@ -300,6 +300,7 @@ const EventDetailsPanel = () => {
 					{showRecurrenceControls && (
 						<>
 							<SelectControl
+								__next40pxDefaultSize
 								label={__('Repeat', 'simple-events-manager')}
 								value={meta.event_recurrence || 'single'}
 								options={[

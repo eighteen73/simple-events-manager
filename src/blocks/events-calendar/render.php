@@ -1,7 +1,7 @@
 <?php
 /**
  * Event calendar block render.
- * Queries single events and occurrence children (one row per occurrence), builds events from each post's meta.
+ * Queries top-level events and expands recurrences into calendar rows.
  *
  * @param array    $attributes     The array of attributes for this block.
  * @param string   $content        Rendered block output.
@@ -14,26 +14,14 @@ defined( 'ABSPATH' ) || exit;
 
 $post_type      = 'event';
 $event_category = isset( $attributes['eventCategory'] ) ? $attributes['eventCategory'] : '';
-$prefix         = $post_type . '_';
 
-// Show only single events and occurrence children (recurring parents are represented by their children).
+// Parents only: expand recurrences in PHP so leftover occurrence children are not listed.
 $query_args = [
-	'post_type'      => $post_type,
-	'posts_per_page' => -1,
-	'orderby'        => 'meta_value',
-	'meta_key'       => $prefix . 'start_date',
-	'order'          => 'ASC',
-	'meta_query'     => [
-		[
-			'key'     => $prefix . 'recurrence',
-			'value'   => 'single',
-			'compare' => '=',
-		],
-		[
-			'key'     => $prefix . 'start_date',
-			'compare' => 'EXISTS',
-		],
-	],
+	'post_type'            => $post_type,
+	'post_parent'          => 0,
+	'posts_per_page'       => -1,
+	'post_status'          => 'publish',
+	'sem_calendar_parents' => true,
 ];
 
 if ( ! empty( $event_category ) ) {
@@ -52,35 +40,13 @@ if ( ! $events_query->have_posts() ) {
 	return;
 }
 
-$today  = gmdate( 'Y-m-d H:i:s', strtotime( 'today midnight' ) );
 $events = [];
 
 while ( $events_query->have_posts() ) {
 	$events_query->the_post();
-	$post_id   = get_the_ID();
-	$start_ymd = get_post_meta( $post_id, $prefix . 'start_date', true );
-	$end_ymd   = get_post_meta( $post_id, $prefix . 'end_date', true );
-
-	if ( ! is_string( $start_ymd ) || $start_ymd === '' ) {
-		continue;
-	}
-	if ( ! is_string( $end_ymd ) || $end_ymd === '' ) {
-		$end_ymd = $start_ymd;
-	}
-
-	$start_dt = gmdate( 'Y-m-d H:i:s', strtotime( $start_ymd . ' midnight' ) );
-	$end_dt   = gmdate( 'Y-m-d H:i:s', strtotime( $end_ymd . ' midnight + 1 day - 1 second' ) );
-
-	if ( $end_dt < $today ) {
-		continue;
-	}
-
-	$events[] = [
-		'title' => get_the_title(),
-		'url'   => get_permalink(),
-		'start' => $start_dt,
-		'end'   => $end_dt,
-	];
+	$post_id     = (int) get_the_ID();
+	$occurrences = \Eighteen73\SimpleEventsManager\EventOccurrences::get_occurrences_for_post( $post_id, $post_type );
+	$events      = array_merge( $events, $occurrences );
 }
 
 wp_reset_postdata();
