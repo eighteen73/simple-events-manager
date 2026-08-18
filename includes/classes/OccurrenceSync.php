@@ -33,6 +33,7 @@ class OccurrenceSync {
 	 */
 	public function boot(): void {
 		add_action( 'save_post_event', [ $this, 'sync_occurrences_for_event' ], 20, 2 );
+		add_action( 'rest_after_insert_event', [ $this, 'sync_occurrences_after_rest' ], 10, 2 );
 		add_action( 'before_delete_post', [ $this, 'delete_children_before_parent' ], 10, 2 );
 		add_action( 'trashed_post', [ $this, 'trash_children_when_parent_trashed' ], 10, 1 );
 		add_action( 'untrashed_post', [ $this, 'restore_children_when_parent_restored' ], 10, 1 );
@@ -65,6 +66,17 @@ class OccurrenceSync {
 		}
 		$query['order'] = strtoupper( $query['order'] ?? 'ASC' ) === 'DESC' ? 'DESC' : 'ASC';
 		return $query;
+	}
+
+	/**
+	 * Sync after REST has written post meta (Gutenberg saves meta after save_post).
+	 *
+	 * @param \WP_Post         $post    Inserted/updated post.
+	 * @param \WP_REST_Request $request REST request.
+	 * @return void
+	 */
+	public function sync_occurrences_after_rest( \WP_Post $post, $request ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		$this->sync_occurrences_for_event( (int) $post->ID, $post );
 	}
 
 	/**
@@ -563,6 +575,9 @@ class OccurrenceSync {
 			return;
 		}
 		if ( $query->get( 'post_type' ) !== 'event' ) {
+			return;
+		}
+		if ( $query->get( 'sem_calendar_parents' ) ) {
 			return;
 		}
 		$existing_meta     = $query->get( 'meta_query' );
